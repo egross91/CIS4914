@@ -2,8 +2,5 @@
 **/.idea
 **/.tmp
 **/dist
-**/.idea/tasks.xml
 **/*.iws
-**/.idea/misc.xml
-**/.idea/workspace.xml
 **/*.class
