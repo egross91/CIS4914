@@ -17,10 +17,13 @@ exports.login = function (data, send) {
 			send(errorHandler);
     }
 
-		var preparedStatement = "SELECT firstName, lastName " + 
-							       	      "FROM Users " + 
-                            "WHERE email = $1 AND password = $2";
-    var inserts           = [ data.email, data.password ];
+    var preparedStatement = "SELECT nameFirst, nameLast " + 
+							       	      "FROM User_Gen " + 
+                            "WHERE userId IN (SELECT userId " + 
+                                             "FROM User_Pers " +
+                                             "WHERE email = $1 AND password = $2);";
+    // var saltedPassword    = PasswordHasher.generate(rawPassword);
+    var inserts           = [ email, rawPassword ];
 
     client.query(preparedStatement, inserts, function (err, result) {
       done();
