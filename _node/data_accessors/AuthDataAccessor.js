@@ -1,5 +1,6 @@
-var postgres    = require('pg');
-var ErrorHelper = require('../helpers/ErrorHelper');
+var Postgres       = require('pg');
+var PasswordHasher = require('password-hash');
+var ErrorHelper    = require('../helpers/ErrorHelper');
 
 var postgresConnectionString = process.env.MU_CONN_STR;
 
@@ -9,7 +10,7 @@ exports.login = function (data, send) {
   var errorHandler = { hasErrors: false, messages: [], statusCode: 200 };
 
 	/** Connect to Postgres DB. **/
-	postgres.connect(postgresConnectionString, function (err, client, done) {
+	Postgres.connect(postgresConnectionString, function (err, client, done) {
 		if (err) {
       ErrorHelper.mergeMessages(errorHandler, err);
       errorHandler.statusCode = 400;
@@ -22,8 +23,8 @@ exports.login = function (data, send) {
                             "WHERE userId IN (SELECT userId " + 
                                              "FROM User_Pers " +
                                              "WHERE email = $1 AND password = $2);";
-    // var saltedPassword    = PasswordHasher.generate(rawPassword);
-    var inserts           = [ email, rawPassword ];
+    var saltedPassword    = PasswordHasher.generate(rawPassword);
+    var inserts           = [ email, saltedPassword ];
 
     client.query(preparedStatement, inserts, function (err, result) {
       done();
