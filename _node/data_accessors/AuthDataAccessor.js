@@ -1,3 +1,5 @@
+'use strict';
+
 var Postgres       = require('pg');
 var PasswordHasher = require('password-hash');
 var ErrorHelper    = require('../helpers/ErrorHelper');
