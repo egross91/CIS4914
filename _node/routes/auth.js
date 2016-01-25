@@ -5,8 +5,11 @@ var router = express.Router();
 
 var AuthController = require('../controllers/AuthController');
 
+// TODO: Middleware - JWT
+
 /* POST register user. */
-/* TODO: Registration. */
+router.post('/register', AuthController.register);
+
 
 /* POST login user. */
 router.post('/login', AuthController.login);
