@@ -5,7 +5,7 @@ var ErrorHelper = require('../helpers/ErrorHelper');
 
 exports.register = function (req, res, err) {
 	var handler = { hasErrors: false, messages: [], statusCode: 200 };
-	var data    = req.body;
+	var data    = req.headers;
 
 	AuthDA.register(data, function (err, userData) {
 		// TODO: Fix DRY.
@@ -20,7 +20,7 @@ exports.register = function (req, res, err) {
 
 exports.login = function (req, res, err) {
 	var handler = { hasErrors: false, messages: [], statusCode: 200 };
-	var data    = req.body;
+	var data    = req.headers;
 	
 	AuthDA.login(data, function (err, userData) {
 		if (err.hasErrors) {
