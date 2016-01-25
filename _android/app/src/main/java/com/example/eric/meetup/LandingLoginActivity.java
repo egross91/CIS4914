@@ -211,13 +211,10 @@ public class LandingLoginActivity extends AppCompatActivity implements LoaderCal
     private boolean isPasswordValid(String password) {
         if (password.length() < 8)
             return false;
-        System.out.println("length");
         if (!containsCharInSequence(password, LOWERCASE_LETTERS))
             return false;
-        System.out.println("lower");
         if (!containsCharInSequence(password, UPPERCASE_LETTERS))
             return false;
-        System.out.println("upper");
         if (!containsCharInSequence(password, LEGAL_CHARS))
             return false;
 
