@@ -1,4 +1,4 @@
-package com.example.eric.meetup;
+package com.example.eric.meetup.activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -29,8 +29,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.eric.meetup.R;
+import com.example.eric.meetup.errorhandling.RequestFailedException;
+import com.example.eric.meetup.errorhandling.UserNotFoundException;
+import com.example.eric.meetup.networking.MeetUpConnection;
+
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -49,14 +53,12 @@ public class LandingLoginActivity extends AppCompatActivity implements LoaderCal
      */
     private static final int REQUEST_READ_CONTACTS = 0;
 
+    /**
+     * Password Validation strings.
+     */
     private static final String LOWERCASE_LETTERS = "abcdefghijklmnopqrstuvwxyz";
     private static final String UPPERCASE_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final String LEGAL_CHARS       = ".!?,-_";
-
-    // TODO: Fix to not be localhost.
-    private static final String MU_API_URL        = "http://192.168.1.101:3000/auth/";
-    private static final String LOGIN             = "login";
-    private static final String REGISTER          = "register";
 
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -336,37 +338,24 @@ public class LandingLoginActivity extends AppCompatActivity implements LoaderCal
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            URL url = null;
-
-            try {
-                url = new URL(MU_API_URL + LOGIN);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
+            System.out.println("start");
 
             // Attempt to login.
             try {
-                HttpURLConnection client = (HttpURLConnection) url.openConnection();
-                BufferedReader response = null;
-
-                client.setDoOutput(true); // POST request
-                client.setRequestProperty("email", mEmail);
-                client.setRequestProperty("password", mPassword);
-
-                response = new BufferedReader(new InputStreamReader(client.getInputStream()));
-
-                // TODO: Check the status returned from the request.
-                String line = null;
-                while ((line = response.readLine()) != null) {
-                    System.out.println(line);
-                }
-            } catch (Exception e) {
+                MeetUpConnection connection = new MeetUpConnection();
+                connection.login(mEmail, mPassword);
+            } catch (UserNotFoundException e) {
+                // TODO: Ask user to register.
+                // if (wantsToRegister)
+                // connection.register(mEmail, mPassword);
+                e.printStackTrace();
+                return false;
+            } catch (RequestFailedException e) {
+                // TODO: Inform user that request failed.
                 e.printStackTrace();
                 return false;
             }
 
-            // TODO: register the new account here.
             return true;
         }
 
