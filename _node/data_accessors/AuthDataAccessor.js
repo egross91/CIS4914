@@ -108,19 +108,15 @@ exports.login = function (data, send) {
       return;
     }
 
-    var preparedStatement = "SELECT nameFirst, nameLast " + 
-							       	      "FROM User_Gen " + 
-                            "WHERE userId IN (SELECT userId " + 
-                                             "FROM User_Pers " +
-                                             "WHERE email = $1 AND password = $2);";
-    var saltedPassword    = PasswordHasher.generate(rawPassword);
-    var inserts           = [ email, saltedPassword ];
+    var prelimPreparedStatement = "SELECT userId, password " + 
+                                  "FROM User_Pers " +
+                                  "WHERE email = $1;";
+    var inserts           = [ email ];
     var userData          = {};
 
     /** Query for user information. **/
-    client.query(preparedStatement, inserts, function (err, result) {
+    client.query(prelimPreparedStatement, inserts, function (err, result) {
       done();
-      console.log(result);
 
       /*** Problem querying database. ***/
       if (err) {
@@ -132,8 +128,13 @@ exports.login = function (data, send) {
         /*** User was found. ***/
         userData = result.rows[0];
 
-        // TODO: JWT.
-        // userData.jwt = generateJwt();
+        /**** Verify their password is correct. ****/
+        if (PasswordHasher.verify(rawPassword, userData.password)) {
+          // TODO: JWT.
+          // userData.jwt = generateJwt();
+        } else {
+          ErrorHelper.addMessages(errorHandler, 401, "Incorrect password."); // Unauthorized.
+        }
       }
 
       send(errorHandler, userData);
