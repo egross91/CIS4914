@@ -10,7 +10,6 @@ var AuthController = require('../controllers/AuthController');
 /* POST register user. */
 router.post('/register', AuthController.register);
 
-
 /* POST login user. */
 router.post('/login', AuthController.login);
 

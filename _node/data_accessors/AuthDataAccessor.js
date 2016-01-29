@@ -26,8 +26,8 @@ exports.register = function (data, send) {
   Postgres.connect(postgresConnectionString, function (err, client, done) {
     /** Problem connecting to database. **/
     if (err) {
-      ErrorHelper.mergeMessages(errorHandler, err);
-      errorHandler.statusCode = 500; // Internal Server Error.
+      ErrorHelper.mergeMessages(errorHandler, 500, err); // Internal Server Error.
+      ErrorHelper.addMessages(errorHandler, errorHandler.statusCode, "Failed to connect to database.");
 
       send(errorHandler);
       return;
@@ -41,33 +41,34 @@ exports.register = function (data, send) {
 
     /** Check if email exists. **/
     client.query(queryPreparedStatement, queryInserts, function (err, result) {
-      done();
-
-      if (result.rows.length !== 0) {
-        if (err) {
-          /*** Problem while querying for email. ***/
-          ErrorHelper.mergeMessages(errorHandler, err);
-          errorHandler.statusCode = 500; // Internal Server Error.
-        } else if (result.rows.length > 0) { 
-          /*** User exists. ***/
-          ErrorHelper.addMessages(errorHandler, (email + " already exists! :'("));
-          errorHandler.statusCode = 409; // Conflict.
-        }
+      if (err) {
+        /*** Problem while querying for email. ***/
+        ErrorHelper.mergeMessages(errorHandler, 500, err); // Internal Server Error.
 
         send(errorHandler, userData);
-      } else { // if (result.rows.length === 0)
+        done();
+        return;
+      }
+
+      if (result.rows.length > 0) {
+        /*** User exists. ***/
+        ErrorHelper.addMessages(errorHandler, 409, (email + " already exists! :'(")); // Conflict.
+
+        send(errorHandler, userData);
+        done();
+      } else if (result.rows.length === 0) {
         /*** User does NOT exist. ***/
-        var insertPreparedStatement = "INSERT INTO User_Pers (email, password) " +
-                                      "VALUES ($1, $2);";
-        var saltedPassword          = PasswordHasher.generate(rawPassword);
-        var insertInserts           = [ email, saltedPassword ];
+        var setupPreparedStatement = "SELECT * " +
+                                     "FROM setup_user($1, $2) AS f(success);";
+        var saltedPassword         = PasswordHasher.generate(rawPassword);
+        var insertInserts          = [ email, saltedPassword ];
 
         /*** Create new user in database. **/
-        client.query(insertPreparedStatement, insertInserts, function (err, result) {
+        client.query(setupPreparedStatement, insertInserts, function (err, result) {
           /**** Problem inserting into database. ****/
           if (err) {
-            ErrorHelper.mergeMessages(errorHandler, err);
-            errorHandler.statusCode = 500;
+            ErrorHelper.mergeMessages(errorHandler, 500, err);
+            ErrorHelper.addMessages(errorHandler, errorHandler.statusCode, "Error querying.");
           } else if (result.rows.length === 0) {
             /**** Insert was good. ****/
             // TODO: JWT.
@@ -75,7 +76,13 @@ exports.register = function (data, send) {
           }
 
           send(errorHandler, userData);
+          done();
         });
+      } else {
+        ErrorHelper.addMessages(errorHandler, 520, "Something went wrong with registration."); // Unknown.
+
+        send(errorHandler, userData);
+        done();
       }
     });
   });
@@ -95,8 +102,7 @@ exports.login = function (data, send) {
 	Postgres.connect(postgresConnectionString, function (err, client, done) {
     /** Problem connecting to database. **/
 		if (err) {
-      ErrorHelper.mergeMessages(errorHandler, err);
-      errorHandler.statusCode = 500; // Internal Server Error.
+      ErrorHelper.mergeMessages(errorHandler, 500, err); // Internal Server Error.
 
 			send(errorHandler);
       return;
@@ -114,15 +120,14 @@ exports.login = function (data, send) {
     /** Query for user information. **/
     client.query(preparedStatement, inserts, function (err, result) {
       done();
+      console.log(result);
 
       /*** Problem querying database. ***/
       if (err) {
-        ErrorHelper.mergeMessages(errorHandler, err);
-        errorHandler.statusCode = 500; // Internal Server Error.
+        ErrorHelper.mergeMessages(errorHandler, 500, err); // Internal Server Error.
       } else if (result.rows.length === 0) {
         /*** User does not exist. ***/
-        ErrorHelper.addMessages(errorHandler, ("User " + email + " does not exist."));
-        errorHandler.statusCode = 400; // Bad Request.
+        ErrorHelper.addMessages(errorHandler, 400, ("User " + email + " does not exist.")); // Bad Request.
       } else if (result.rows.length === 1) {
         /*** User was found. ***/
         userData = result.rows[0];

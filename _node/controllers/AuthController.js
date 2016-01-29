@@ -10,7 +10,7 @@ exports.register = function (req, res, err) {
 	AuthDA.register(data, function (err, userData) {
 		// TODO: Fix DRY.
 		if (err.hasErrors) {
-			ErrorHelper.mergeMessages(handler, err);
+			ErrorHelper.mergeMessages(handler, err.statusCode, err);
 		}
 
 		res.statusCode = handler.statusCode;
@@ -24,7 +24,7 @@ exports.login = function (req, res, err) {
 	
 	AuthDA.login(data, function (err, userData) {
 		if (err.hasErrors) {
-			ErrorHelper.mergeMessages(handler, err);
+			ErrorHelper.mergeMessages(handler, err.statusCode, err);
 		}
 
 		res.statusCode = handler.statusCode;
