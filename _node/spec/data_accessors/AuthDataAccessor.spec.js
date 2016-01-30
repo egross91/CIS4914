@@ -10,19 +10,22 @@ var jwtSecret        = process.env.MU_JWT_SECRET;
 var AuthDA = require('../../data_accessors/AuthDataAccessor');
 
 describe("Testing the Authorization Data Accessor - makes DB calls.", function () {
-  /* Mock Objects. */
+  /**
+   * Object mocks.
+   **/  
   var requestMockObj = {
     email: "",
     password: ""
   };
 
-  /* Terror down after each test. */
+  /* Clean up before each test. */
   beforeEach(function (done) {
     Postgres.connect(connectionString, function (err, client, disconnect) {
       client.query("DELETE FROM User_Pers;");
-      client.query("DELETE FROM User_Gen;");
-      disconnect();
-      done();
+      client.query("DELETE FROM User_Gen;", function () {
+        disconnect();
+        done();
+      });
     });
 
     requestMockObj.email    = "test@test.net";

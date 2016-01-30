@@ -1,28 +1,36 @@
 'use strict';
 
 exports.mergeMessages = function(to, statusCode, from) {
-	var message   = "";
-  to.hasErrors  = true;
-  to.statusCode = from.statusCode;
-  
-	if (from.messages) {
-		for (var i = 0; i < from.messages.length; ++i) {
-      message = from.messages[i];
+	var message  = "";
 
-			if (messageOk(message))
-				to.messages.push(message);
-		}
-	} else if (from.error) {
-    for (var i = 0; i < from.error.length; ++i) {
-      message = from.error[i];
+  if (argOk(to, "object")) {
+    to.hasErrors = true;
+    
+  	if (argOk(from, "object")) {
+      if (from.messages) {
+    		for (var i = 0; i < from.messages.length; ++i) {
+          message = from.messages[i];
 
-      if (messageOk(message)) {
-        to.messages.push(err);
+    			if (argOk(message, "string"))
+    				to.messages.push(message);
+    		}
+      } 
+      if (from.error) {
+        for (var i = 0; i < from.error.length; ++i) {
+          message = from.error[i];
+
+          if (argOk(message, "string")) {
+            to.messages.push(message);
+          }
+        }
       }
-    }
-  } else if (from.message) {
-		to.messages.push(from.message);
-	}
+      if (from.message) {
+        to.messages.push(from.message);
+      }
+  	}
+  } else {
+    throw "No error handler.";
+  }
 
   setStatusCode(to, statusCode);
 };
@@ -32,13 +40,13 @@ exports.addMessages = function() {
   var statusCode = arguments[1];
 	var arg;
 
-	if (typeof to === "object") {
+	if (argOk(to, "object")) {
 		to.hasErrors  = true;
 
 		for (var i = 1; i < arguments.length; ++i) {
 			arg = arguments[i];
 
-			if (messageOk(arg))
+			if (argOk(arg, "string"))
 				to.messages.push(arg);
 		}
 	} else {
@@ -51,12 +59,12 @@ exports.addMessages = function() {
 /**
  * Helper functions.
  **/
-var messageOk = function (msg) {
-  return (msg && typeof msg === "string");
+var argOk = function (arg, type) {
+  return (arg && typeof arg === type);
 };
 
 var setStatusCode = function (handler, code) {
-  if (code && typeof code === "number") {
+  if (argOk(code, "number")) {
     handler.statusCode = code;
   } else {
     handler.statusCode = 500;
