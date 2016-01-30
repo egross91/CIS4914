@@ -1,0 +1,1 @@
+var AuthController = require('../../controllers/AuthController');
