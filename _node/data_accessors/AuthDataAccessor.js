@@ -5,12 +5,19 @@
  **/
 var Postgres       = require('pg');
 var PasswordHasher = require('password-hash');
+var JWT            = require('jsonwebtoken');
 var ErrorHelper    = require('../helpers/ErrorHelper');
 
 /**
  * Static strings.
  **/
 var postgresConnectionString = process.env.MU_CONN_STR;
+var jwtSecret                = process.env.MU_JWT_SECRET;
+
+/** 
+ * Helper Objects.
+ **/
+var jwtOptions = { expiresIn: 7200 }; // In Seconds.
 
 /**
  * @param data: User registration information.
@@ -46,7 +53,7 @@ exports.register = function (data, send) {
         ErrorHelper.mergeMessages(errorHandler, 500, err); // Internal Server Error.
 
         send(errorHandler, userData);
-        done();
+        done(); // Close DB connection.
         return;
       }
 
@@ -55,7 +62,7 @@ exports.register = function (data, send) {
         ErrorHelper.addMessages(errorHandler, 409, (email + " already exists! :'(")); // Conflict.
 
         send(errorHandler, userData);
-        done();
+        done(); // Close DB connection.
       } else if (result.rows.length === 0) {
         /*** User does NOT exist. ***/
         var setupPreparedStatement = "SELECT * " +
@@ -69,20 +76,23 @@ exports.register = function (data, send) {
           if (err) {
             ErrorHelper.mergeMessages(errorHandler, 500, err);
             ErrorHelper.addMessages(errorHandler, errorHandler.statusCode, "Error querying.");
-          } else if (result.rows.length === 0) {
-            /**** Insert was good. ****/
-            // TODO: JWT.
-            // userData.jwt = generateJwt();
+          } 
+
+          if (result.rows[0].success) {
+            var token = JWT.sign(userData, jwtSecret, jwtOptions);
+            send(errorHandler, token);
+          } else {
+            ErrorHelper.addMessages(errorHandler, 500, "Failed to register user in database.");
+            send(errorHandler, userData);
           }
 
-          send(errorHandler, userData);
-          done();
+          done(); // Close DB connection.
         });
       } else {
         ErrorHelper.addMessages(errorHandler, 520, "Something went wrong with registration."); // Unknown.
 
         send(errorHandler, userData);
-        done();
+        done(); // Close DB connection.
       }
     });
   });
@@ -116,8 +126,6 @@ exports.login = function (data, send) {
 
     /** Query for user information. **/
     client.query(prelimPreparedStatement, inserts, function (err, result) {
-      done();
-
       /*** Problem querying database. ***/
       if (err) {
         ErrorHelper.mergeMessages(errorHandler, 500, err); // Internal Server Error.
@@ -129,14 +137,45 @@ exports.login = function (data, send) {
         userData = result.rows[0];
 
         /**** Verify their password is correct. ****/
-        if (PasswordHasher.verify(rawPassword, userData.password)) {
-          // TODO: JWT.
-          // userData.jwt = generateJwt();
+        var userPassword = userData.password;
+        delete userData.password; // Don't leave sensitive breadcrumbs.
+
+        if (PasswordHasher.verify(rawPassword, userPassword)) {
+          /***** Get the user's name for client purposes. *****/
+          var userInfoPreparedStatement = "SELECT nameFirst, nameLast " +
+                                          "FROM User_Gen " +
+                                          "WHERE userId=$1;"
+          var userInfoInserts           = [ userData.userid ];
+
+          client.query(userInfoPreparedStatement, userInfoInserts, function (err, result) {
+            done(); // Close DB connection.
+
+            /****** Error querying for user info. ******/
+            if (err) {
+              ErrorHelper.mergeMessages(errorHandler, 500, err);
+            } else if (result.rows.length > 0) {
+              /******* User info was found - create a JWT. *******/
+              userData  = result.rows[0];
+              var token = JWT.sign(userData, jwtSecret, jwtOptions);
+
+              send(errorHandler, token);
+              return;
+            } else {
+              ErrorHelper.addMessages(errorHandler, 520, "Something went wrong while retrieving user info.");
+            }
+
+            send(errorHandler, userData);
+          });
         } else {
+          done(); // Close DB connection.
           ErrorHelper.addMessages(errorHandler, 401, "Incorrect password."); // Unauthorized.
+          send(errorHandler, userData);
         }
+
+        return; // Don't make a send requst twice.
       }
 
+      done(); // Close DB connection.
       send(errorHandler, userData);
     });
 	});

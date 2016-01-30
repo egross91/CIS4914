@@ -9,12 +9,14 @@ exports.register = function (req, res, err) {
 
 	AuthDA.register(data, function (err, userData) {
 		// TODO: Fix DRY.
+		res.statusCode = handler.statusCode;
+
 		if (err.hasErrors) {
 			ErrorHelper.mergeMessages(handler, err.statusCode, err);
+			res.send(handler);
+		} else {
+			res.send(userData);
 		}
-
-		res.statusCode = handler.statusCode;
-		res.send(handler);
 	});
 };
 
@@ -23,11 +25,13 @@ exports.login = function (req, res, err) {
 	var data    = req.headers;
 	
 	AuthDA.login(data, function (err, userData) {
+		res.statusCode = handler.statusCode;
+
 		if (err.hasErrors) {
 			ErrorHelper.mergeMessages(handler, err.statusCode, err);
+			res.send(handler);
+		} else {
+			res.send(userData);
 		}
-
-		res.statusCode = handler.statusCode;
-		res.send(handler);
 	});
 };
