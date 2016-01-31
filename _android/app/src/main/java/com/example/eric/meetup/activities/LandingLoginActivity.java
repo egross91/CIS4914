@@ -33,12 +33,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.eric.meetup.R;
+import com.example.eric.meetup.applications.MeetUpApplication;
 import com.example.eric.meetup.errorhandling.RequestFailedException;
 import com.example.eric.meetup.errorhandling.UserNotFoundException;
 import com.example.eric.meetup.helpers.ToastHelper;
 import com.example.eric.meetup.networking.MeetUpConnection;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +48,7 @@ import static android.Manifest.permission.READ_CONTACTS;
 /**
  * A login screen that offers login via email/password.
  */
-public class LandingLoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
+public class LandingLoginActivity extends MeetUpActivity implements LoaderCallbacks<Cursor> {
 
     /**
      * Id to identity READ_CONTACTS permission request.
@@ -103,6 +103,21 @@ public class LandingLoginActivity extends AppCompatActivity implements LoaderCal
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setApplicationActivity(this);
+        MeetUpApplication app = setApplicationActivity(this);
+        app.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        MeetUpApplication app = setApplicationActivity(null);
+        app.onPause();
     }
 
     private void populateAutoComplete() {
@@ -328,9 +343,9 @@ public class LandingLoginActivity extends AppCompatActivity implements LoaderCal
     private abstract class UserRequestTask extends AsyncTask<Void, Void, Integer> {
         private final String mEmail;
         private final String mPassword;
-        private final Activity mActivity;
+        private final MeetUpActivity mActivity;
 
-        public UserRequestTask(String email, String password, Activity activity) {
+        public UserRequestTask(String email, String password, MeetUpActivity activity) {
             mEmail = email;
             mPassword = password;
             mActivity = activity;
@@ -344,7 +359,7 @@ public class LandingLoginActivity extends AppCompatActivity implements LoaderCal
             return mPassword;
         }
 
-        protected Activity getActivity() {
+        protected MeetUpActivity getActivity() {
             return mActivity;
         }
     }
@@ -355,26 +370,31 @@ public class LandingLoginActivity extends AppCompatActivity implements LoaderCal
      */
     public class UserLoginTask extends UserRequestTask {
 
-        public UserLoginTask(String email, String password, Activity activity) {
+        public UserLoginTask(String email, String password, MeetUpActivity activity) {
             super(email, password, activity);
         }
 
         @Override
         protected Integer doInBackground(Void... params) {
+            String response = null;
+
             // Attempt to login.
             try {
                 MeetUpConnection connection = new MeetUpConnection();
-                connection.login(getEmail(), getPassword());
+                response = connection.login(getEmail(), getPassword());
             } catch (UserNotFoundException e) {
-                e.printStackTrace();
-
+                // User does not exist.
                 return HttpURLConnection.HTTP_BAD_REQUEST;
             } catch (RequestFailedException e) {
+                // Something on the backend went wrong.
                 ToastHelper errorToast = new ToastHelper(getActivity());
                 errorToast.display(getString(R.string.request_failed));
 
                 return HttpURLConnection.HTTP_INTERNAL_ERROR;
             }
+
+            // Login was successful.
+            getActivity().setJwt(response);
 
             return HttpURLConnection.HTTP_OK;
         }
@@ -386,6 +406,7 @@ public class LandingLoginActivity extends AppCompatActivity implements LoaderCal
 
             ToastHelper resultToast = new ToastHelper(getActivity());
 
+            // As the user if they would like to register, because the email was not found.
             if (statusCode == HttpURLConnection.HTTP_BAD_REQUEST) {
                 runOnUiThread(new Runnable() {
                     @Override
@@ -439,21 +460,29 @@ public class LandingLoginActivity extends AppCompatActivity implements LoaderCal
     }
 
     public class UserRegistrationTask extends UserRequestTask {
-        public UserRegistrationTask(String email, String password, Activity activity) {
+        public UserRegistrationTask(String email, String password, MeetUpActivity activity) {
             super(email, password, activity);
         }
 
         @Override
         protected Integer doInBackground(Void... params) {
-            MeetUpConnection registrationConnection = new MeetUpConnection();
-            registrationConnection.register(getEmail(), getPassword());
+            String response = null;
 
             int responseCode;
             try {
+                MeetUpConnection registrationConnection = new MeetUpConnection();
+
+                response     = registrationConnection.register(getEmail(), getPassword());
                 responseCode = registrationConnection.getResponseCode();
-            } catch (IOException e) {
+            } catch (Exception e) {
+                // Something while registering the user went wrong.
                 e.printStackTrace();
                 responseCode = 500;
+            }
+
+            // Stored the JWT we get back from the response.
+            if (response != null && responseCode == HttpURLConnection.HTTP_OK) {
+                getActivity().setJwt(response);
             }
 
             return responseCode;
