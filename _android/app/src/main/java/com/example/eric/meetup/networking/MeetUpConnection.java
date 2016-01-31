@@ -6,6 +6,7 @@ import com.example.eric.meetup.errorhandling.RequestFailedException;
 import com.example.eric.meetup.errorhandling.UserNotFoundException;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -69,6 +70,10 @@ public class MeetUpConnection {
         }
 
         return true;
+    }
+
+    public int getResponseCode() throws IOException {
+        return (mConnection != null) ? mConnection.getResponseCode() : -1;
     }
 
     private HttpURLConnection getConnection(String urlString) throws Exception {

@@ -3,6 +3,9 @@ package com.example.eric.meetup.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -32,12 +35,11 @@ import android.widget.TextView;
 import com.example.eric.meetup.R;
 import com.example.eric.meetup.errorhandling.RequestFailedException;
 import com.example.eric.meetup.errorhandling.UserNotFoundException;
+import com.example.eric.meetup.helpers.ToastHelper;
 import com.example.eric.meetup.networking.MeetUpConnection;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,7 +65,7 @@ public class LandingLoginActivity extends AppCompatActivity implements LoaderCal
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    private UserLoginTask mAuthTask = null;
+    private UserRequestTask mAuthTask = null;
 
     // UI references.
     private AutoCompleteTextView mEmailView;
@@ -194,7 +196,7 @@ public class LandingLoginActivity extends AppCompatActivity implements LoaderCal
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
+            mAuthTask = new UserLoginTask(email, password, this);
             mAuthTask.execute((Void) null);
         }
     }
@@ -323,52 +325,85 @@ public class LandingLoginActivity extends AppCompatActivity implements LoaderCal
         int IS_PRIMARY = 1;
     }
 
+    private abstract class UserRequestTask extends AsyncTask<Void, Void, Integer> {
+        private final String mEmail;
+        private final String mPassword;
+        private final Activity mActivity;
+
+        public UserRequestTask(String email, String password, Activity activity) {
+            mEmail = email;
+            mPassword = password;
+            mActivity = activity;
+        }
+
+        protected String getEmail() {
+            return mEmail;
+        }
+
+        protected String getPassword() {
+            return mPassword;
+        }
+
+        protected Activity getActivity() {
+            return mActivity;
+        }
+    }
+
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-        private final String mEmail;
-        private final String mPassword;
+    public class UserLoginTask extends UserRequestTask {
 
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
+        public UserLoginTask(String email, String password, Activity activity) {
+            super(email, password, activity);
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
-            System.out.println("start");
-
+        protected Integer doInBackground(Void... params) {
             // Attempt to login.
             try {
                 MeetUpConnection connection = new MeetUpConnection();
-                connection.login(mEmail, mPassword);
+                connection.login(getEmail(), getPassword());
             } catch (UserNotFoundException e) {
-                // TODO: Ask user to register.
-                // if (wantsToRegister)
-                // connection.register(mEmail, mPassword);
                 e.printStackTrace();
-                return false;
+
+                return HttpURLConnection.HTTP_BAD_REQUEST;
             } catch (RequestFailedException e) {
-                // TODO: Inform user that request failed.
-                e.printStackTrace();
-                return false;
+                ToastHelper errorToast = new ToastHelper(getActivity());
+                errorToast.display(getString(R.string.request_failed));
+
+                return HttpURLConnection.HTTP_INTERNAL_ERROR;
             }
 
-            return true;
+            return HttpURLConnection.HTTP_OK;
         }
 
         @Override
-        protected void onPostExecute(final Boolean success) {
+        protected void onPostExecute(final Integer statusCode) {
             mAuthTask = null;
             showProgress(false);
 
-            if (success) {
-                finish();
+            if (statusCode == HttpURLConnection.HTTP_BAD_REQUEST) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        AlertDialog.Builder builder = setUpAlertDialogBuilder(
+                                getString(R.string.cancel),
+                                getString(R.string.register),
+                                getEmail(),
+                                getPassword());
+                        AlertDialog alert = builder.create();
+
+                        alert.show();
+                    }
+                });
+            } else if (statusCode == HttpURLConnection.HTTP_OK) {
+                ToastHelper welcomeToast = new ToastHelper(getActivity());
+                welcomeToast.display(getString(R.string.welcome_to_meetup));
             } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
+                ToastHelper failToast = new ToastHelper(getActivity());
+                failToast.display(String.format(getString(R.string.login_failed), getEmail()));
             }
         }
 
@@ -376,6 +411,65 @@ public class LandingLoginActivity extends AppCompatActivity implements LoaderCal
         protected void onCancelled() {
             mAuthTask = null;
             showProgress(false);
+        }
+
+        private AlertDialog.Builder setUpAlertDialogBuilder(CharSequence negMsg, CharSequence posMsg,
+                                                            final String email, final String password) {
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
+
+            dialogBuilder.setTitle(String.format(getString(R.string.registration_message), email));
+
+            dialogBuilder.setNegativeButton(negMsg, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+
+            dialogBuilder.setPositiveButton(posMsg, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    UserRegistrationTask registrationTask = new UserRegistrationTask(getEmail(), getPassword(), getActivity());
+                    registrationTask.execute();
+                }
+            });
+
+            return dialogBuilder;
+        }
+    }
+
+    public class UserRegistrationTask extends UserRequestTask {
+        public UserRegistrationTask(String email, String password, Activity activity) {
+            super(email, password, activity);
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            MeetUpConnection registrationConnection = new MeetUpConnection();
+            registrationConnection.register(getEmail(), getPassword());
+
+            int responseCode;
+            try {
+                responseCode = registrationConnection.getResponseCode();
+            } catch (IOException e) {
+                e.printStackTrace();
+                responseCode = 500;
+            }
+
+            return responseCode;
+        }
+
+        @Override
+        public void onPostExecute(final Integer statusCode) {
+            if (statusCode == HttpURLConnection.HTTP_OK) {
+                ToastHelper successToast = new ToastHelper(getActivity());
+                successToast.display(String.format(getString(R.string.registration_successful), getEmail()));
+                // TODO: Take user to UserLandingActivity.
+            }
+            else {
+                ToastHelper errorToast = new ToastHelper(getActivity());
+                errorToast.display(String.format(getString(R.string.registration_failed), getEmail()));
+            }
         }
     }
 }

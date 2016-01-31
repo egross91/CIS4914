@@ -19,7 +19,7 @@ describe("Testing the Authorization Data Accessor - makes DB calls.", function (
   };
 
   /* Clean up before each test. */
-  beforeEach(function (done) {
+  afterEach(function (done) {
     Postgres.connect(connectionString, function (err, client, disconnect) {
       client.query("DELETE FROM User_Pers;");
       client.query("DELETE FROM User_Gen;", function () {

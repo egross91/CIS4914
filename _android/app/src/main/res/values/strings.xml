@@ -13,4 +13,12 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="welcome_to_meetup">Welcome to MeetUp!</string>
+    <string name="request_failed">Request Failed</string>
+    <string name="login_failed">Failed to login %s! :(</string>
+    <string name="registration_message">%s was not found. Would you like to register?</string>
+    <string name="registration_successful">%s was registered successfully!</string>
+    <string name="registration_failed">Failed to register %s! :(</string>
+    <string name="register">Register</string>
+    <string name="cancel">Cancel</string>
 </resources>
