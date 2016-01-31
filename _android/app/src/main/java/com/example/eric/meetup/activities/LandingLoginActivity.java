@@ -384,6 +384,8 @@ public class LandingLoginActivity extends AppCompatActivity implements LoaderCal
             mAuthTask = null;
             showProgress(false);
 
+            ToastHelper resultToast = new ToastHelper(getActivity());
+
             if (statusCode == HttpURLConnection.HTTP_BAD_REQUEST) {
                 runOnUiThread(new Runnable() {
                     @Override
@@ -399,11 +401,9 @@ public class LandingLoginActivity extends AppCompatActivity implements LoaderCal
                     }
                 });
             } else if (statusCode == HttpURLConnection.HTTP_OK) {
-                ToastHelper welcomeToast = new ToastHelper(getActivity());
-                welcomeToast.display(getString(R.string.welcome_to_meetup));
+                resultToast.display(getString(R.string.welcome_to_meetup));
             } else {
-                ToastHelper failToast = new ToastHelper(getActivity());
-                failToast.display(String.format(getString(R.string.login_failed), getEmail()));
+                resultToast.display(String.format(getString(R.string.login_failed), getEmail()));
             }
         }
 
@@ -461,14 +461,14 @@ public class LandingLoginActivity extends AppCompatActivity implements LoaderCal
 
         @Override
         public void onPostExecute(final Integer statusCode) {
+            ToastHelper resultToast = new ToastHelper(getActivity());
+
             if (statusCode == HttpURLConnection.HTTP_OK) {
-                ToastHelper successToast = new ToastHelper(getActivity());
-                successToast.display(String.format(getString(R.string.registration_successful), getEmail()));
+                resultToast.display(String.format(getString(R.string.registration_successful), getEmail()));
                 // TODO: Take user to UserLandingActivity.
             }
             else {
-                ToastHelper errorToast = new ToastHelper(getActivity());
-                errorToast.display(String.format(getString(R.string.registration_failed), getEmail()));
+                resultToast.display(String.format(getString(R.string.registration_failed), getEmail()));
             }
         }
     }
