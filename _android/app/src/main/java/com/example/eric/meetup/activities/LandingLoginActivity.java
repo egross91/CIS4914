@@ -22,6 +22,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -37,6 +38,7 @@ import com.example.eric.meetup.applications.MeetUpApplication;
 import com.example.eric.meetup.errorhandling.RequestFailedException;
 import com.example.eric.meetup.errorhandling.UserNotFoundException;
 import com.example.eric.meetup.helpers.ToastHelper;
+import com.example.eric.meetup.networking.MeetUpAuthConnection;
 import com.example.eric.meetup.networking.MeetUpConnection;
 
 import java.net.HttpURLConnection;
@@ -186,7 +188,7 @@ public class LandingLoginActivity extends MeetUpActivity implements LoaderCallba
         View focusView = null;
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (TextUtils.isEmpty(password) || !isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
@@ -380,7 +382,7 @@ public class LandingLoginActivity extends MeetUpActivity implements LoaderCallba
 
             // Attempt to login.
             try {
-                MeetUpConnection connection = new MeetUpConnection();
+                MeetUpAuthConnection connection = new MeetUpAuthConnection();
                 response = connection.login(getEmail(), getPassword());
             } catch (UserNotFoundException e) {
                 // User does not exist.
@@ -470,9 +472,9 @@ public class LandingLoginActivity extends MeetUpActivity implements LoaderCallba
 
             int responseCode;
             try {
-                MeetUpConnection registrationConnection = new MeetUpConnection();
+                MeetUpAuthConnection registrationConnection = new MeetUpAuthConnection();
 
-                response     = registrationConnection.register(getEmail(), getPassword());
+                response = registrationConnection.register(getEmail(), getPassword());
                 responseCode = registrationConnection.getResponseCode();
             } catch (Exception e) {
                 // Something while registering the user went wrong.

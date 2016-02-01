@@ -10,7 +10,7 @@ import com.example.eric.meetup.activities.MeetUpActivity;
 
 /**
  * This class is meant to represent the state of the Application
- * that the user is current in. Mostly meant for holding
+ * that the user is currently in. Mostly meant for holding
  * and passing the JWT that will be used in requests to
  * the MeetUp API.
  */
@@ -51,6 +51,11 @@ public class MeetUpApplication extends Application {
         }
 
         // TODO: Check if user's JWT is good - if not, LoginLanding; else, UserLanding.
+    }
+
+    private boolean isSessionOk() {
+        // TODO: Check if user's JWT is good.
+        throw new UnsupportedOperationException("This method is yet to be implemented.");
     }
 
     public void setJwt(String jwt) {
