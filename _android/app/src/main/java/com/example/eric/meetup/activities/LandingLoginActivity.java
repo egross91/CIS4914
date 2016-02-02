@@ -425,6 +425,7 @@ public class LandingLoginActivity extends MeetUpActivity implements LoaderCallba
                 });
             } else if (statusCode == HttpURLConnection.HTTP_OK) {
                 resultToast.display(getString(R.string.welcome_to_meetup));
+                // TODO: Take user to UserLandingActivity.
             } else {
                 resultToast.display(String.format(getString(R.string.login_failed), getEmail()));
             }
