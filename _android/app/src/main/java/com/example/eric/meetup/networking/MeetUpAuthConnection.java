@@ -1,5 +1,8 @@
 package com.example.eric.meetup.networking;
 
+import android.text.TextUtils;
+import android.util.Log;
+
 import com.example.eric.meetup.errorhandling.RequestFailedException;
 import com.example.eric.meetup.errorhandling.UserNotFoundException;
 
