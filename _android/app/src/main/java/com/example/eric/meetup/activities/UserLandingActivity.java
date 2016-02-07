@@ -6,6 +6,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.eric.meetup.R;
 
@@ -36,9 +37,10 @@ public class UserLandingActivity extends MeetUpActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_landing_activity);
-        bt = (Button) findViewById(R.id.button);
-        lv = (ListView) findViewById(R.id.listView);
-        et = (EditText) findViewById(R.id.editText);
+        bt = (Button) findViewById(R.id.mAddButton);
+        lv = (ListView) findViewById(R.id.mGroupListView);
+        et = (EditText) findViewById(R.id.mEditText);
+
 
         strArr = new ArrayList<String>();
         adapter = new ArrayAdapter<String>(getApplicationContext(),
@@ -49,10 +51,19 @@ public class UserLandingActivity extends MeetUpActivity{
             @Override
             public void onClick(View arg0) {
                 // TODO Auto-generated method stub
-                strArr.add(et.getText().toString());
-                adapter.notifyDataSetChanged();
+                if(strArr.contains(et.getText().toString())){
+                    Toast.makeText(getApplicationContext(), "The group already exists!", Toast.LENGTH_LONG).show();
+
+
+                }
+
+                else{
+                    strArr.add(et.getText().toString());
+                    adapter.notifyDataSetChanged();
+                }
 
             }
+
         });
     }
 
