@@ -23,42 +23,44 @@ import java.util.ArrayList;
  *
  * */
 public class UserLandingActivity extends MeetUpActivity{
-    private Button bt;
-    private ListView lv;
-    private ArrayList<String> strArr;
+    private Button mAddButton;
+    private ListView mListView;
+    private ArrayList<String> groupStrArray;
     private ArrayAdapter<String> adapter;
-    private EditText et;
+    private EditText mEditText;
 
-    // TODO Change font color of listsize atm is clear
+
     // TODO the ability to highlight a listview to remove
-    // TODO prevent creation of groups with same names
+    // TODO ability for selected and pressed to carry onto friends that belong in that group
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_landing_activity);
-        bt = (Button) findViewById(R.id.mAddButton);
-        lv = (ListView) findViewById(R.id.mGroupListView);
-        et = (EditText) findViewById(R.id.mEditText);
+        mAddButton = (Button) findViewById(R.id.add_Button);
+        mListView = (ListView) findViewById(R.id.group_ListView);
+        mEditText = (EditText) findViewById(R.id.edit_Text);
 
 
-        strArr = new ArrayList<String>();
+        groupStrArray = new ArrayList<String>();
         adapter = new ArrayAdapter<String>(getApplicationContext(),
-                android.R.layout.simple_list_item_1, strArr);
-        lv.setAdapter(adapter);
-        bt.setOnClickListener(new View.OnClickListener() {
+                android.R.layout.simple_list_item_1, groupStrArray);
+        mListView.setAdapter(adapter);
+        mAddButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
                 // TODO Auto-generated method stub
-                if(strArr.contains(et.getText().toString())){
+                
+                if(groupStrArray.contains(mEditText.getText().toString())){
                     Toast.makeText(getApplicationContext(), "The group already exists!", Toast.LENGTH_LONG).show();
-
-
                 }
-
+                else if(mEditText.getText().toString().trim().length()==0){
+                    Toast.makeText(getApplicationContext(), "Group cannot be empty!", Toast.LENGTH_LONG).show();
+                }
                 else{
-                    strArr.add(et.getText().toString());
+                    groupStrArray.add(mEditText.getText().toString());
                     adapter.notifyDataSetChanged();
                 }
 

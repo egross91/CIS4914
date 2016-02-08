@@ -10,33 +10,33 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Add Group"
-        android:id="@+id/mAddButton"
+        android:id="@+id/add_Button"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true" />
 
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="#3366CCtest"
-        android:id="@+id/mGroupListView"
-        android:layout_toStartOf="@+id/mAddButton"
-        android:layout_below="@+id/mAddButton" />
+        android:background="@color/colorPrimary"
+        android:id="@+id/group_ListView"
+        android:layout_toStartOf="@+id/add_Button"
+        android:layout_below="@+id/add_Button" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/mEditText"
-        android:layout_above="@+id/mGroupListView"
+        android:id="@+id/edit_Text"
+        android:layout_above="@+id/group_ListView"
         android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/mAddButton" />
+        android:layout_toStartOf="@+id/add_Button" />
 
     <Button
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Remove Group"
-        android:id="@+id/mRemoveButton"
-        android:layout_below="@+id/mAddButton"
+        android:id="@+id/remove_Button"
+        android:layout_below="@+id/add_Button"
         android:layout_alignParentEnd="true"
-        android:layout_toEndOf="@+id/mGroupListView" />
+        android:layout_toEndOf="@+id/group_ListView" />
 </RelativeLayout>
