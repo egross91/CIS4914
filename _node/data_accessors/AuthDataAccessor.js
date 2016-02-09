@@ -79,6 +79,9 @@ exports.register = function (data, send) {
           } 
 
           if (result.rows[0].success) {
+            // Set token data.
+            userData.email = userData.nameFirst = email;
+            
             var token = JWT.sign(userData, jwtSecret, jwtOptions);
             send(errorHandler, token);
           } else {

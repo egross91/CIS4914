@@ -36,16 +36,15 @@ exports.checkToken = function (req, res, next) {
       if (err) {
         ErrorHelper.mergeMessages(handler, 407, err); // Proxy Authentication Required.
         res.send(handler);
-        return;
-      }
-
-      /* Request was good. */
-      if (decoded) {
-        next();
       } else {
-        /* Something went wrong during validation. */
-        ErrorHelper.addMessages(hander, 407, "Could not verify JWT.");
-        res.send(handler);
+        if (decoded) {
+          /* Request was good. */
+          next();
+        } else {
+          /* Something went wrong during validation. */
+          ErrorHelper.addMessages(hander, 407, "Could not verify JWT.");
+          res.send(handler);
+        }
       }
     });
   }
