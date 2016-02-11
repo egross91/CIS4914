@@ -10,7 +10,10 @@ describe("Unit test for Middleware Controller", function () {
    * Strings.
    **/
    var sendMockStr = "send mock";
-   var testJWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lRmlyc3QiOiJ0ZXN0QHRlc3QuY29tIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNDU1MDQ5Njg4LCJleHAiOjE0NTUwNTY4ODh9.rnHix0ao4dDwaf6qaf8Cv67NBXNYlOhHd7oRRG-YrDc";
+   var expiredTestJWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lRmlyc3QiOiJ0ZXN0QHRlc3QuY29tIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNDU1MDQ5Njg4LCJleHAiOjE0NTUwNTY4ODh9.rnHix0ao4dDwaf6qaf8Cv67NBXNYlOhHd7oRRG-YrDc";
+   var expiredJWTStr = "jwt expired";
+
+   var testJWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lRmlyc3QiOiJ0ZXN0QHRlc3QuY29tIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNDU1MjI2NjE2fQ.gAr7tEh_d3sq4NmsSbo_rlW1cdIchCkQFq00VU4gNvI";
 
 	/**
 	 * Object mocks.
@@ -66,12 +69,27 @@ describe("Unit test for Middleware Controller", function () {
   });
 
   it("should call next() if successful", function (done) {
+    // Setup.
     requestMockObj.headers.jwt = testJWT;
 
     setTimeout(function () {
       MiddlewareController.checkToken(requestMockObj, responseMockObj, responseMockObj.onSuccess);
       setTimeout(function () {
         expect(result.success).toBe(true);
+        done();
+      }, 100);
+    }, 100);
+  });
+
+  it("should return 407 error if JWT is expired", function (done) {
+    // Setup.
+    requestMockObj.headers.jwt = expiredTestJWT;
+
+    setTimeout(function () {
+      MiddlewareController.checkToken(requestMockObj, responseMockObj);
+      setTimeout(function () {
+        expect(result.statusCode).toBe(407);
+        expect(result.messages[0]).toBe(expiredJWTStr);
         done();
       }, 100);
     }, 100);
