@@ -1,4 +1,4 @@
-package com.example.eric.meetup.errorhandling;
+package com.meetup.errorhandling;
 
 public class UserNotFoundException extends Exception {
 

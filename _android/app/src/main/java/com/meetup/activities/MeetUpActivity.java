@@ -1,8 +1,8 @@
-package com.example.eric.meetup.activities;
+package com.meetup.activities;
 
 import android.support.v7.app.AppCompatActivity;
 
-import com.example.eric.meetup.applications.MeetUpApplication;
+import com.meetup.applications.MeetUpApplication;
 
 /**
  * Every Activity should inherit from this Activity.

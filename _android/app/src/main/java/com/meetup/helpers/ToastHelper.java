@@ -1,4 +1,4 @@
-package com.example.eric.meetup.helpers;
+package com.meetup.helpers;
 
 import android.app.Activity;
 import android.widget.Toast;

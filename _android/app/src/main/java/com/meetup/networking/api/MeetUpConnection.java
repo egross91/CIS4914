@@ -1,4 +1,4 @@
-package com.example.eric.meetup.networking;
+package com.meetup.networking.api;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,8 +10,11 @@ import java.net.URL;
 
 public abstract class MeetUpConnection {
     // TODO: Fix to not be localhost.
-    protected static final String MU_API_URL = "http://192.168.1.103:3000/auth/";
+    protected static final String MU_API_URL = "10.0.2.2"; // IP to access host machine's IP address from Android device - http://juristr.com/blog/2009/10/accessing-host-machine-from-your/
 
+    /**
+     * Request type strings.
+     */
     public static final String POST    = "POST";
     public static final String GET     = "GET";
     public static final String OPTIONS = "OPTIONS";
@@ -20,6 +23,17 @@ public abstract class MeetUpConnection {
     public static final String TRACE   = "TRACE";
     public static final String HEAD    = "HEAD";
 
+    /**
+     * Helper strings.
+     */
+    protected static final String HTTP          = "http://";
+    protected static final String FORWARD_SLASH = "/";
+    protected static final String COLON         = ":";
+    protected static final String MU_PORT       = "3000";
+
+    /**
+     * Data properties.
+     */
     private HttpURLConnection mConnection;
 
     public MeetUpConnection() { }
@@ -30,6 +44,24 @@ public abstract class MeetUpConnection {
 
     protected HttpURLConnection getConnection() {
         return mConnection;
+    }
+
+    protected String formatURLString(String... args) throws IllegalArgumentException {
+        if (args == null || args.length == 0)
+            throw new IllegalArgumentException("Cannot use empty arguments.");
+
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(HTTP);
+        builder.append(args[0]);
+        builder.append(COLON);
+        builder.append(MU_PORT);
+        for (int i = 1; i < args.length; ++i) {
+            builder.append("/");
+            builder.append(args[i]);
+        }
+
+        return builder.toString();
     }
 
     protected HttpURLConnection openConnection(String urlString) throws MalformedURLException, IOException {

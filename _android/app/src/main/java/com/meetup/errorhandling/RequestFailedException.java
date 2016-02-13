@@ -1,4 +1,4 @@
-package com.example.eric.meetup.errorhandling;
+package com.meetup.errorhandling;
 
 public class RequestFailedException extends Exception {
     public RequestFailedException(String error) {

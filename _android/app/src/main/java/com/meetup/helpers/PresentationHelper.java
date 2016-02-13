@@ -1,6 +1,6 @@
-package com.example.eric.meetup.helpers;
+package com.meetup.helpers;
 
-import com.example.eric.meetup.interfaces.Presentable;
+import com.meetup.interfaces.Presentable;
 
 public abstract class PresentationHelper implements Presentable {
     @Override

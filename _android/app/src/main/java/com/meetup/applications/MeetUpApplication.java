@@ -1,4 +1,4 @@
-package com.example.eric.meetup.applications;
+package com.meetup.applications;
 
 import android.app.Activity;
 import android.app.Application;
@@ -6,7 +6,7 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.example.eric.meetup.activities.MeetUpActivity;
+import com.meetup.activities.MeetUpActivity;
 
 /**
  * This class is meant to represent the state of the Application

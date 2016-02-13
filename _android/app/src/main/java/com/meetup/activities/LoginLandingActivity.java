@@ -1,4 +1,4 @@
-package com.example.eric.meetup.activities;
+package com.meetup.activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -31,12 +31,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.example.eric.meetup.R;
-import com.example.eric.meetup.applications.MeetUpApplication;
-import com.example.eric.meetup.errorhandling.RequestFailedException;
-import com.example.eric.meetup.errorhandling.UserNotFoundException;
-import com.example.eric.meetup.helpers.ToastHelper;
-import com.example.eric.meetup.networking.MeetUpAuthConnection;
+import com.meetup.R;
+import com.meetup.applications.MeetUpApplication;
+import com.meetup.errorhandling.RequestFailedException;
+import com.meetup.errorhandling.UserNotFoundException;
+import com.meetup.helpers.ToastHelper;
+import com.meetup.networking.api.MeetUpAuthConnection;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;

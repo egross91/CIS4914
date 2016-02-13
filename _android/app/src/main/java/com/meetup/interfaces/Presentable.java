@@ -1,4 +1,4 @@
-package com.example.eric.meetup.interfaces;
+package com.meetup.interfaces;
 
 public interface Presentable {
     public void display(CharSequence dialog);

@@ -1,4 +1,4 @@
-package com.example.eric.meetup.activities;
+package com.meetup.activities;
 
 import android.os.Bundle;
 import android.view.View;
@@ -8,7 +8,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.eric.meetup.R;
+import com.meetup.R;
 
 import java.util.ArrayList;
 

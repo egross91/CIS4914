@@ -1,26 +1,30 @@
-package com.example.eric.meetup.networking;
+package com.meetup.networking.api;
 
-import android.text.TextUtils;
-import android.util.Log;
-
-import com.example.eric.meetup.errorhandling.RequestFailedException;
-import com.example.eric.meetup.errorhandling.UserNotFoundException;
+import com.meetup.errorhandling.RequestFailedException;
+import com.meetup.errorhandling.UserNotFoundException;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 
 public class MeetUpAuthConnection extends MeetUpConnection {
+    /**
+     * URL strings.
+     */
+    private static final String AUTH     = "auth";
     private static final String LOGIN    = "login";
     private static final String REGISTER = "register";
 
-    private static final String EMAIL = "email";
+    /**
+     * Request properties.
+     */
+    private static final String EMAIL    = "email";
     private static final String PASSWORD = "password";
 
     public String login(String email, String password) throws UserNotFoundException, RequestFailedException {
         HttpURLConnection connection = null;
         String response = null;
-        String url      = MU_API_URL + LOGIN;
+        String url      = formatURLString(MU_API_URL, AUTH, LOGIN);
 
         try {
             connection = openConnection(url, MeetUpConnection.POST, email, password);
@@ -49,7 +53,7 @@ public class MeetUpAuthConnection extends MeetUpConnection {
     public String register(String email, String password) {
         HttpURLConnection connection = null;
         String response = null;
-        String url      = MU_API_URL + REGISTER;
+        String url      = formatURLString(MU_API_URL, AUTH, REGISTER);
 
         try {
             connection = openConnection(url, MeetUpConnection.POST, email, password);
