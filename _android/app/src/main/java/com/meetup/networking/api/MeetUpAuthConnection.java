@@ -77,7 +77,7 @@ public class MeetUpAuthConnection extends MeetUpConnection {
 
     private HttpURLConnection openConnection(String url, String requestType,
                                              String email, String password) throws MalformedURLException, IOException {
-        HttpURLConnection connection = openConnection(url, requestType);
+        HttpURLConnection connection = super.openConnection(url, requestType);
         connection.setRequestProperty(EMAIL, email);
         connection.setRequestProperty(PASSWORD, password);
 

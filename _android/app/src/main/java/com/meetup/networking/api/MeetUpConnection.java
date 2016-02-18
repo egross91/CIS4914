@@ -1,5 +1,7 @@
 package com.meetup.networking.api;
 
+import com.meetup.networking.utils.NetworkInfoUtil;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +32,11 @@ public abstract class MeetUpConnection {
     protected static final String FORWARD_SLASH = "/";
     protected static final String COLON         = ":";
     protected static final String MU_PORT       = "3000";
+
+    /**
+     * Request properties.
+     */
+    protected static final String IP = "IP";
 
     /**
      * Data properties.
@@ -71,6 +78,7 @@ public abstract class MeetUpConnection {
     protected HttpURLConnection openConnection(String urlString, String requestType) throws MalformedURLException, IOException {
         HttpURLConnection connection = (HttpURLConnection) new URL(urlString).openConnection();
         connection.setRequestMethod(requestType);
+        connection.setRequestProperty(IP, NetworkInfoUtil.getIPAAddress(true));
         setConnection(connection);
 
         return connection;
