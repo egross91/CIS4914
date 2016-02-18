@@ -66,7 +66,8 @@ exports.register = function (data, send) {
       } else if (result.rows.length === 0) {
         /*** User does NOT exist. ***/
         var setupPreparedStatement = "SELECT * " +
-                                     "FROM setup_user($1, $2) AS f(success);";
+                                     "FROM setup_user($1, $2) " + 
+                                     "AS f(success);";
         var saltedPassword         = PasswordHasher.generate(rawPassword);
         var insertInserts          = [ email, saltedPassword ];
 
@@ -76,11 +77,11 @@ exports.register = function (data, send) {
           if (err) {
             ErrorHelper.mergeMessages(errorHandler, 500, err);
             ErrorHelper.addMessages(errorHandler, errorHandler.statusCode, "Error querying.");
-          } 
-
-          if (result.rows[0].success) {
+          }
+          else if (result.rows[0].success !== -1) {
             // Set token data.
-            userData.email = userData.nameFirst = email;
+            userData.email  = userData.nameFirst = email;
+            userData.userId = result.rows[0].success;
             
             var token = JWT.sign(userData, jwtSecret, jwtOptions);
             send(errorHandler, token);

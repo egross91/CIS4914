@@ -5,6 +5,7 @@
  **/
 var JWT = require('jsonwebtoken');
 var ErrorHelper = require('../helpers/ErrorHelper');
+var MiddlewareDA = require('../data_accessors/MiddlewareDataAccessor');
 
 /**
  * Static strings.
@@ -25,7 +26,7 @@ var jwtSecret = process.env.MU_JWT_SECRET;
  *           it is not expired.
  **/
 exports.checkToken = function (req, res, next) {
-	var jwtData = req.headers.jwt;
+  var jwtData = req.headers.jwt;
 	var handler = { hasErrors: false, messages: [], statusCode: 200 };
 
   if (!jwtData) {
@@ -45,6 +46,33 @@ exports.checkToken = function (req, res, next) {
           ErrorHelper.addMessages(hander, 407, "Could not verify JWT.");
           res.send(handler);
         }
+      }
+    });
+  }
+};
+
+/**
+ * @param req: User HTTP request.
+ * @param res: HTTP response.
+ * @param next: The 'next' function in the chain of command.
+ * @summary: Updates the user's IP address in the DB.
+ **/
+exports.updateIP = function (req, res, next) {
+  var data    = req.headers;
+  var handler = { hasErrors: false, messages: [], statusCode: 200 };
+
+  if (!data.ip) {
+    ErrorHelper.addMessages(handler, 412, "No IP was found in request."); // Precondition Failed
+
+    res.send(handler);
+  } else {
+    MiddlewareDA.updateIP(data, function (err, data) {
+      if (err.hasErrors) {
+        ErrorHelper.mergeMessages(handler, err.statusCode, err);
+        res.send(handler);
+      } else {
+        /* Success. */
+        next();
       }
     });
   }

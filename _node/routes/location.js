@@ -6,9 +6,10 @@ var router = express.Router();
 var LocationController = require('../controllers/LocationController');
 var MiddlewareController = require('../controllers/MiddlewareController');
 
-// router.use(MiddlewareController.checkToken);
+router.use(MiddlewareController.checkToken);
+router.use(MiddlewareController.updateIP);
 
-// TODO: LocationController.
+/* GET user location by id. */
 router.get('/:userId', LocationController.getUserLocation);
 
 
