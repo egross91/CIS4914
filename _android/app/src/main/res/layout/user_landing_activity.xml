@@ -20,7 +20,9 @@
         android:background="@color/colorPrimary"
         android:id="@+id/group_ListView"
         android:layout_toStartOf="@+id/add_Button"
+        android:drawSelectorOnTop="false"
         android:layout_below="@+id/add_Button" />
+
 
     <EditText
         android:layout_width="wrap_content"
@@ -39,4 +41,15 @@
         android:layout_below="@+id/add_Button"
         android:layout_alignParentEnd="true"
         android:layout_toEndOf="@+id/group_ListView" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rename Group"
+        android:id="@+id/Rename"
+        android:layout_below="@+id/remove_Button"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/group_ListView" />
+
 </RelativeLayout>
