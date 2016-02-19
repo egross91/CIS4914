@@ -4,3 +4,4 @@
 \i ../schema/User_Loc.sql;
 \i ../schema/User_Device.sql;
 \i ../schema/User_Groups.sql;
+\i ../schema/User_Friends.sql;
