@@ -27,8 +27,8 @@ exports.getUserLocation = function (data, send) {
     if (err) {
       ErrorHelper.mergeMessages(errorHandler, 500, err);
       ErrorHelper.addMessages(errorHandler, errorHandler.statusCode, "Failed to connect to database.");
-
       send(errorHandler);
+      done();
     } else {
       var locationPreparedStatement = "SELECT longitude, latitude " +
                                       "FROM User_Loc " +
@@ -37,25 +37,19 @@ exports.getUserLocation = function (data, send) {
       var userData                  = {};
 
       client.query(locationPreparedStatement, inserts, function (err, result) {
+        done(); // Close DB Connection.
+
         if (err) {
           ErrorHelper.mergeMessages(errorHandler, 500, err);
-
-          send(errorHandler, userData);
-          done(); // Close DB Connection.
         } else if (result.rows.length === 0) {
           ErrorHelper.addMessages(errorHandler, 204, ("No location for userId: " + userId + "."));
-
-          send(errorHandler, userData);
-          done();
         } else if (result.rows.length === 1) {
           userData = result;
-          send(errorHandler, userData);
-          done();
         } else {
           ErrorHelper.addMessages(errorHandler, 520, "Something went wrong with getting location data.");
-          send(errorHandler, userData);
-          done();
         }
+
+        send(errorHandler, userData);
       });
     }
   });

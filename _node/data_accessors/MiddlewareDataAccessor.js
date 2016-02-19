@@ -18,7 +18,7 @@ var ErrorHelper = require('../helpers/ErrorHelper');
  * @param send: Callback on successs.
  * @summary: Updates the user's IP address within the database.
  * @note: The JWT is assumed to be good because it _should_ have
- *        went through the checkToken() middleware first.
+ *        went through the checkToken() MiddlewareController first.
  **/
 exports.updateIP = function (data, send) {
   var ip           = data.ip;
@@ -29,7 +29,6 @@ exports.updateIP = function (data, send) {
   Postgres.connect(postgresConnectionString, function (err, client, done) {
     if (err) {
       ErrorHelper.mergeMessages(errorHandler, 500, err); // Internal Server Error.
-
       send(errorHandler);
       done();
     } else {
