@@ -40,13 +40,15 @@ exports.getUserLocation = function (data, send) {
         done(); // Close DB Connection.
 
         if (err) {
-          ErrorHelper.mergeMessages(errorHandler, 500, err);
-        } else if (result.rows.length === 0) {
-          ErrorHelper.addMessages(errorHandler, 204, ("No location for userId: " + userId + "."));
-        } else if (result.rows.length === 1) {
-          userData = result;
+          ErrorHelper.mergeMessages(errorHandler, 500, err); // Internal Server Error.
         } else {
-          ErrorHelper.addMessages(errorHandler, 520, "Something went wrong with getting location data.");
+           if (result.rows.length === 0) {
+            ErrorHelper.addMessages(errorHandler, 204, ("No location for userId: " + userId + ".")); // No Content.
+          } else if (result.rows.length === 1) {
+            userData = result;
+          } else {
+            ErrorHelper.addMessages(errorHandler, 520, "Something went wrong with getting location data."); // Unknown Error.
+          }
         }
 
         send(errorHandler, userData);

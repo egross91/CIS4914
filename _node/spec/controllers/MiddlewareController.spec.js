@@ -21,7 +21,8 @@ describe("Unit test for Middleware Controller", function () {
   // The 'request.'
 	var requestMockObj = {
 		headers: {
-      jwt: ""
+      jwt: "",
+      ip: ""
     }
 	};
 
@@ -30,8 +31,8 @@ describe("Unit test for Middleware Controller", function () {
 
   // The 'response.'
   var responseMockObj = { 
-    send: function (err, data) {
-      result = err;
+    send: function (data) {
+      result = data;
     },
     onSuccess: function () {
       result.success = true;
@@ -41,6 +42,7 @@ describe("Unit test for Middleware Controller", function () {
   beforeEach(function () {
     // Reset mock objects.
     requestMockObj.headers.jwt = "";
+    requestMockObj.headers.ip  = "";
 
     result = {
       success: false
@@ -93,5 +95,12 @@ describe("Unit test for Middleware Controller", function () {
         done();
       }, 100);
     }, 100);
+  });
+
+  it("should return a 412 error if no IP is supplied to updateIP()", function () {
+    expect(requestMockObj.headers.ip).toBeFalsy();
+
+    MiddlewareController.updateIP(requestMockObj, responseMockObj);
+    expect(result.statusCode).toBe(412); // Precondition Failed.
   });
 }); 

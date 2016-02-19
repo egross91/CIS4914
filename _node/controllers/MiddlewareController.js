@@ -3,8 +3,8 @@
 /**
  * Modules
  **/
-var JWT = require('jsonwebtoken');
-var ErrorHelper = require('../helpers/ErrorHelper');
+var JWT          = require('jsonwebtoken');
+var ErrorHelper  = require('../helpers/ErrorHelper');
 var MiddlewareDA = require('../data_accessors/MiddlewareDataAccessor');
 
 /**
