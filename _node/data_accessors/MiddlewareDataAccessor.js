@@ -24,7 +24,7 @@ exports.updateIP = function (data, send) {
   var ip           = data.ip;
   var token        = data.jwt;
   var userData     = JWT.decode(token);
-  var errorHandler = { hasErrors: false, messages: [], statusCode: 200 };
+  var errorHandler = ErrorHelper.getHandler();
 
   Postgres.connect(postgresConnectionString, function (err, client, done) {
     if (err) {

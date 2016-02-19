@@ -19,7 +19,7 @@ var postgresConnectionString = process.env.MU_CONN_STR;
  **/
 exports.getUserLocation = function (data, send) {
   var userId       = data.userId;
-	var errorHandler = { hasErrors: false, messages: [], statusCode: 200 };
+	var errorHandler = ErrorHelper.getHandler();
 
   /* Connect to database. */
   Postgres.connect(postgresConnectionString, function (err, client, done) {

@@ -13,7 +13,7 @@ var ErrorHelper = require('../helpers/ErrorHelper');
  * @summary: Retrieves the specified user's location from the DB.
  **/
 exports.getUserLocation = function (req, res, err) {
-	var handler = { hasErrors: false, messages: [], statusCode: 200 };
+	var handler = ErrorHelper.getHandler();
 	var data    = req.params;
 
 	LocationDA.getUserLocation(data, function (err, userData) {

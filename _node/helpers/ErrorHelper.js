@@ -1,5 +1,16 @@
 'use strict';
 
+exports.getHandler = function (hasErr, msgs, code) {
+  var handler = {};
+
+  handler.hasErrors  = (argOk(hasErr, "boolean")) ? hasErr : false;
+  handler.messages   = (argOk(msgs, "object"))    ? msgs   : [];
+  handler.statusCode = (argOk(code, "number"))    ? code : 200;
+
+  return handler;
+};
+
+
 exports.mergeMessages = function(to, statusCode, from) {
 	var message  = "";
 

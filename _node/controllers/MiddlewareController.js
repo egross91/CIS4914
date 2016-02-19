@@ -27,7 +27,7 @@ var jwtSecret = process.env.MU_JWT_SECRET;
  **/
 exports.checkToken = function (req, res, next) {
   var jwtData = req.headers.jwt;
-	var handler = { hasErrors: false, messages: [], statusCode: 200 };
+	var handler = ErrorHelper.getHandler();
 
   if (!jwtData) {
 		ErrorHelper.addMessages(handler, 400, "No JWT data was supplied.");
@@ -59,7 +59,7 @@ exports.checkToken = function (req, res, next) {
  **/
 exports.updateIP = function (req, res, next) {
   var data    = req.headers;
-  var handler = { hasErrors: false, messages: [], statusCode: 200 };
+  var handler = ErrorHelper.getHandler();
 
   if (!data.ip) {
     ErrorHelper.addMessages(handler, 412, "No IP was found in request."); // Precondition Failed

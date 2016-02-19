@@ -27,7 +27,7 @@ var jwtOptions = { expiresIn: 7200 }; // In Seconds.
 exports.register = function (data, send) {
   var email        = data.email;
   var rawPassword  = data.password;
-  var errorHandler = { hasErrors: false, messages: [], statusCode: 200 };
+  var errorHandler = ErrorHelper.getHandler();
 
   /* Connect to database. */
   Postgres.connect(postgresConnectionString, function (err, client, done) {
@@ -110,7 +110,7 @@ exports.register = function (data, send) {
 exports.login = function (data, send) {
 	var email        = data.email;
 	var rawPassword  = data.password;
-  var errorHandler = { hasErrors: false, messages: [], statusCode: 200 };
+  var errorHandler = ErrorHelper.getHandler();
 
 	/* Connect to Postgres DB. */
 	Postgres.connect(postgresConnectionString, function (err, client, done) {
