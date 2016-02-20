@@ -163,7 +163,8 @@ exports.login = function (data, send) {
                 } else {
                   if (result.rows.length > 0) {
                     /******* User info was found - create a JWT. *******/
-                    userData  = result.rows[0];
+                    userData        = result.rows[0];
+                    userData.userId = userInfoInserts[0];
                     var token = JWT.sign(userData, jwtSecret, jwtOptions);
 
                     send(errorHandler, token);
