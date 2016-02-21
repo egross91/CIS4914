@@ -59,7 +59,6 @@ public class UserLandingActivity extends MeetUpActivity {
         mRenameButton = (Button) findViewById(R.id.Rename);
 
 
-
         groupStrArray = new ArrayList<String>();
         adapter = new ArrayAdapter<String>(getApplicationContext(),
                 android.R.layout.simple_list_item_single_choice, groupStrArray);
@@ -67,31 +66,18 @@ public class UserLandingActivity extends MeetUpActivity {
         mListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
         mAddButton.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View arg0) {
-                // TODO Auto-generated method stub
-
-                if (groupStrArray.contains(mEditText.getText().toString())) {
-                    Toast.makeText(getApplicationContext(), "The group already exists!", Toast.LENGTH_LONG).show();
-                } else if (mEditText.getText().toString().trim().length() == 0) {
-                    Toast.makeText(getApplicationContext(), "Group cannot be empty!", Toast.LENGTH_LONG).show();
-                } else {
-                    groupStrArray.add(mEditText.getText().toString());
-                    adapter.notifyDataSetChanged();
-                }
-
+                add();
+            }
+        });
+        mRenameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                update();
             }
 
         });
-
-//        mRenameButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View arg0) {
-//               update();
-//            }
-//
-//        });
         mRemoveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
@@ -100,47 +86,58 @@ public class UserLandingActivity extends MeetUpActivity {
 
         });
 
-
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mEditText.setText(groupStrArray.get(position));
-
-
             }
         });
+    }
+    private void add(){
+        if (groupStrArray.contains(mEditText.getText().toString().trim())) {
+            Toast.makeText(getApplicationContext(), "The group already exists!", Toast.LENGTH_LONG).show();
+            mEditText.setText("");
+        } else if (mEditText.getText().toString().trim().length() == 0) {
+            Toast.makeText(getApplicationContext(), "Group cannot be empty!", Toast.LENGTH_LONG).show();
+            mEditText.setText("");
+        } else {
+            groupStrArray.add(mEditText.getText().toString().trim());
+            mEditText.setText("");
+            adapter.notifyDataSetChanged();
+        }
 
     }
+
     private void delete() {
-
-
-          if (mEditText.getText().toString().trim().length() != 0) {
-            groupStrArray.remove(mEditText.getText().toString());
+        if (mListView.getCheckedItemPosition() > -1) {
+            groupStrArray.remove(mListView.getCheckedItemPosition());
             adapter.notifyDataSetChanged();
             mEditText.setText("");
             Toast.makeText(getApplicationContext(), "Group Deleted", Toast.LENGTH_LONG).show();
-        }
-        else {
+        } else {
             Toast.makeText(getApplicationContext(), "Nothing to Delete", Toast.LENGTH_LONG).show();
         }
-
+        mEditText.setText("");
     }
+    private void update() {
 
-//    private void update(){
-//
-//        String name = mEditText.getText().toString();
-//        if(!name.isEmpty() && name.length()>0){
-//            groupStrArray.remove(sing);
-//            groupStrArray.add(pos,name);
-//            adapter.notifyDataSetChanged();
-//            Toast.makeText(getApplicationContext(), "Group Renamed", Toast.LENGTH_LONG).show();
-//        }
-//        else {
-//            Toast.makeText(getApplicationContext(), "Nothing to Rename", Toast.LENGTH_LONG).show();
-//        }
-//
-//    }
+        String name = mEditText.getText().toString().trim();
+        if(name.isEmpty()){
+            Toast.makeText(getApplicationContext(), "Nothing to Rename", Toast.LENGTH_LONG).show();
+        }
+        else if(groupStrArray.contains(name)){
+            Toast.makeText(getApplicationContext(), "Group Name Exists!", Toast.LENGTH_LONG).show();
+        }
+        else {
+            groupStrArray.set(mListView.getCheckedItemPosition(), name);
+            adapter.notifyDataSetChanged();
+            Toast.makeText(getApplicationContext(), "Group Renamed", Toast.LENGTH_LONG).show();
+            mEditText.setText("");
 
-
-
+        }
+    }
 }
+
+
+
+
