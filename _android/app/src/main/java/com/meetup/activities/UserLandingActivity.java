@@ -1,8 +1,8 @@
 package com.meetup.activities;
 
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -11,10 +11,11 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.meetup.R;
+import com.meetup.helpers.OnDoubleTapHelper;
+
 
 import java.util.ArrayList;
 
@@ -29,7 +30,7 @@ import java.util.ArrayList;
  * User is then able to request additional friends to join the group
  */
 //TODO make remove dependent on selection rather than name in editText
-public class UserLandingActivity extends MeetUpActivity {
+public class UserLandingActivity extends MeetUpActivity  {
     private Button mAddButton;
     private Button mRemoveButton;
     private Button mRenameButton;
@@ -37,11 +38,22 @@ public class UserLandingActivity extends MeetUpActivity {
     private ArrayList<String> groupStrArray;
     private ArrayAdapter<String> adapter;
     private EditText mEditText;
+
+
+
+
+
+
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
     private GoogleApiClient client;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client2;
 
 
     // TODO the ability to highlight a listview to remove
@@ -57,6 +69,8 @@ public class UserLandingActivity extends MeetUpActivity {
         mListView = (ListView) findViewById(R.id.group_ListView);
         mEditText = (EditText) findViewById(R.id.edit_Text);
         mRenameButton = (Button) findViewById(R.id.Rename);
+
+
 
 
         groupStrArray = new ArrayList<String>();
@@ -85,15 +99,35 @@ public class UserLandingActivity extends MeetUpActivity {
             }
 
         });
+        mListView.setOnTouchListener(new OnDoubleTapHelper(this){
+
+
+            public void onDoubleTap(MotionEvent e){
+                Toast.makeText(getApplicationContext(), "DoubleTap", Toast.LENGTH_LONG).show();
+                Intent groupListActivity = new Intent(UserLandingActivity.this, GroupListActivity.class);
+                startActivity(groupListActivity);
+           }
+
+        });
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mEditText.setText(groupStrArray.get(position));
+
+
             }
         });
+
+
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client2 = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
-    private void add(){
+
+    private void add() {
         if (groupStrArray.contains(mEditText.getText().toString().trim())) {
             Toast.makeText(getApplicationContext(), "The group already exists!", Toast.LENGTH_LONG).show();
             mEditText.setText("");
@@ -119,16 +153,15 @@ public class UserLandingActivity extends MeetUpActivity {
         }
         mEditText.setText("");
     }
+
     private void update() {
 
         String name = mEditText.getText().toString().trim();
-        if(name.isEmpty()){
+        if (name.isEmpty()) {
             Toast.makeText(getApplicationContext(), "Nothing to Rename", Toast.LENGTH_LONG).show();
-        }
-        else if(groupStrArray.contains(name)){
+        } else if (groupStrArray.contains(name)) {
             Toast.makeText(getApplicationContext(), "Group Name Exists!", Toast.LENGTH_LONG).show();
-        }
-        else {
+        } else {
             groupStrArray.set(mListView.getCheckedItemPosition(), name);
             adapter.notifyDataSetChanged();
             Toast.makeText(getApplicationContext(), "Group Renamed", Toast.LENGTH_LONG).show();
@@ -136,7 +169,9 @@ public class UserLandingActivity extends MeetUpActivity {
 
         }
     }
+
 }
+
 
 
 
