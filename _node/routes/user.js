@@ -9,6 +9,7 @@ var router  = express.Router();
 var UserController       = require('../controllers/UserController');
 var MiddlewareController = require('../controllers/MiddlewareController');
 
+
 /* Middleware. */
 router.use(MiddlewareController.checkToken);
 router.use(MiddlewareController.updateIP); 
@@ -20,7 +21,7 @@ router.get('/friends', UserController.getFriends);
 router.get('/groups', UserController.getGroups);
 
 /* GET user group information. */
-// router.get('/group/:groupId', UserController.getGroup);
+router.get('/group', UserController.getGroup);
 
 /* POST update group information. */
 // router.post('/group/update/:groupId', UserController.updateGroup);
