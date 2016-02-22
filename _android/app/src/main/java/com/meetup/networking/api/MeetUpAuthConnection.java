@@ -9,7 +9,7 @@ import java.net.MalformedURLException;
 
 public class MeetUpAuthConnection extends MeetUpConnection {
     /**
-     * URL strings.
+     * Endpoint strings.
      */
     private static final String AUTH     = "auth";
     private static final String LOGIN    = "login";
