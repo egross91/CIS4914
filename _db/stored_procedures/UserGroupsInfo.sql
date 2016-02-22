@@ -12,7 +12,7 @@ BEGIN
 				  		FROM Groups_Info gi
 				  		WHERE gi.groupId IN (SELECT ug.groupId
 				  							 FROM User_Groups ug
-				  							 WHERE ug.userId=user_id
+				  							 WHERE user_id=ANY(ug.groupMembers::INT[])
 				  							)
 				  		) outerquery
 				  );
