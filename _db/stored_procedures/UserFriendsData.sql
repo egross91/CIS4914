@@ -10,10 +10,10 @@ BEGIN
 				  			   ug.nameLast,
 				  			   ug.userId
 				  		FROM User_Gen ug
-				  		WHERE ug.userId IN (SELECT uf.friendId
-				  							FROM User_Friends uf
-				  						 	WHERE uf.userId=user_id
-				  						 	)
+				  		WHERE ug.userId=ANY((SELECT uf.friendIds
+				  							 FROM User_Friends uf
+				  						 	 WHERE uf.userId=user_id
+				  						 	 )::INT[])
 				  		) outerquery
 				  );
 END;

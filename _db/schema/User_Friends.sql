@@ -1,9 +1,7 @@
 CREATE TABLE User_Friends (
-	userId   INT NOT NULL,
-	friendId INT NOT NULL,
+	userId    INT NOT NULL,
+	friendIds INT ARRAY,
 	FOREIGN KEY (userId)
 		REFERENCES User_Pers(userId) ON DELETE CASCADE,
-	FOREIGN KEY (friendId)
-		REFERENCES User_Pers(userId),
-	CHECK (userId <> friendId) -- Cannot be friends with yourself.
+	CHECK (userId<>ANY(friendIds::INT[])) -- Cannot be friends with yourself.
 );
