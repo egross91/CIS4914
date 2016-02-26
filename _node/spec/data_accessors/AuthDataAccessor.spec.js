@@ -11,25 +11,30 @@ var AuthDA = require('../../data_accessors/AuthDataAccessor');
 
 describe("Testing the Authorization Data Accessor - makes DB calls.", function () {
   /**
+   * Static strings.
+   **/
+   var dummyEmail    = "mock@test.net";
+   var dummyPassword = "Test1234.";
+
+  /**
    * Object mocks.
    **/  
   var requestMockObj = {
-    email: "",
-    password: ""
+    email: dummyEmail,
+    password: dummyPassword
   };
 
   /* Clean up before each test. */
   afterEach(function (done) {
     Postgres.connect(connectionString, function (err, client, disconnect) {
-      client.query("DELETE FROM User_Pers;");
-      client.query("DELETE FROM User_Gen;", function () {
+      client.query("DELETE FROM User_Pers WHERE email=$1;", [ dummyEmail ], function () {
         disconnect();
         done();
       });
     });
 
-    requestMockObj.email    = "test@test.net";
-    requestMockObj.password = "Test1234";
+    requestMockObj.email    = dummyEmail;
+    requestMockObj.password = dummyPassword;
   });
 
   it("should register a user without error", function (done) {
