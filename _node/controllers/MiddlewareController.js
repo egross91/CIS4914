@@ -31,11 +31,13 @@ exports.checkToken = function (req, res, next) {
 
   if (!jwtData) {
 		ErrorHelper.addMessages(handler, 400, "No JWT data was supplied.");
+    res.statusCode = handler.statusCode;
 		res.send(handler);
 	} else {
     JWT.verify(jwtData, jwtSecret, function (err, decoded) {
       if (err) {
         ErrorHelper.mergeMessages(handler, 407, err); // Proxy Authentication Required.
+        res.statusCode = handler.statusCode;
         res.send(handler);
       } else {
         if (decoded) {
@@ -44,6 +46,7 @@ exports.checkToken = function (req, res, next) {
         } else {
           /* Something went wrong during validation. */
           ErrorHelper.addMessages(hander, 407, "Could not verify JWT.");
+          res.statusCode = handler.statusCode;
           res.send(handler);
         }
       }
@@ -63,12 +66,13 @@ exports.updateIP = function (req, res, next) {
 
   if (!data.ip) {
     ErrorHelper.addMessages(handler, 412, "No IP was found in request."); // Precondition Failed
-
+    res.statusCode = handler.statusCode;
     res.send(handler);
   } else {
     MiddlewareDA.updateIP(data, function (err, data) {
       if (err.hasErrors) {
         ErrorHelper.mergeMessages(handler, err.statusCode, err);
+        res.statusCode = handler.statusCode;
         res.send(handler);
       } else {
         /* Success. */
