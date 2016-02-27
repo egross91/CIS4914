@@ -39,7 +39,7 @@ describe("Unit test for Location Controller", function () {
       setTimeout(function () {
         expect(result.statusCode).toBe(204); // No Content.
         done();
-      }, 375);
+      }, 600);
     }, 100);
   });
 });
