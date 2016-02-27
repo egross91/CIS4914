@@ -52,6 +52,38 @@ exports.getFriends = function (data, send) {
 };
 
 /**
+ * @param data: Headers from HTTP request..
+ * @param send: Callback - to be called on error or success.
+ * @summary: Updates the specified user's friends' information in the DB.
+ **/
+exports.updateFriends = function (data, send) {
+  var userId       = JWT.decode(data.jwt, jwtSecret).userId;
+  var friendIds    = '{' + data.friendids + '}';
+  var errorHandler = ErrorHelper.getHandler();
+
+  Postgres.connect(postgresConnectionString, function (err, client, done) {
+    if (err) {
+      ErrorHelper.mergeMessages(errorHandler, 500, err); // Internal Server Error.
+      send(errorHandler);
+    } else {
+      var preparedStatement = "SELECT * " +
+                              "FROM user_friends_upsert($1::int, $2::int[]);";
+      var inserts           = [ userId, friendIds ];
+
+      client.query(preparedStatement, inserts, function (err, result) {
+        done(); // Clone DB connection.
+
+        if (err) {
+          ErrorHelper.mergeMessages(errorHandler, 500, err); // Internal Server Error.
+        }
+
+        send(errorHandler);
+      });
+    }
+  });
+};
+
+/**
  * @param data: JWT from user request.
  * @param send: Callback - to be called on error or success.
  * @summary: Retrieves the specified user's groups' information from the DB.

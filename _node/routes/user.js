@@ -17,6 +17,9 @@ router.use(MiddlewareController.updateIP);
 /* GET user's friends. */
 router.get('/friends', UserController.getFriends);
 
+/* POST update user's friends. */
+router.post('/friends/update', UserController.updateFriends);
+
 /* GET user's groups. */
 router.get('/groups', UserController.getGroups);
 
