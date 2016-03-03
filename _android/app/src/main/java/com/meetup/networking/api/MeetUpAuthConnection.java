@@ -24,7 +24,7 @@ public class MeetUpAuthConnection extends MeetUpConnection {
     public String login(String email, String password) throws UserNotFoundException, RequestFailedException {
         HttpURLConnection connection = null;
         String response = null;
-        String url      = formatURLString(MU_API_URL, AUTH, LOGIN);
+        String url      = formatURLString(getUrl(), AUTH, LOGIN);
 
         try {
             connection = openConnection(url, MeetUpConnection.POST, email, password);
@@ -53,7 +53,7 @@ public class MeetUpAuthConnection extends MeetUpConnection {
     public String register(String email, String password) {
         HttpURLConnection connection = null;
         String response = null;
-        String url      = formatURLString(MU_API_URL, AUTH, REGISTER);
+        String url      = formatURLString(getUrl(), AUTH, REGISTER);
 
         try {
             connection = openConnection(url, MeetUpConnection.POST, email, password);

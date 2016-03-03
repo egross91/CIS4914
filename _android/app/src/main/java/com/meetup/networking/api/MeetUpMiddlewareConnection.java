@@ -11,6 +11,11 @@ import java.net.MalformedURLException;
  */
 public abstract class MeetUpMiddlewareConnection extends MeetUpConnection {
     /**
+     * Endpoint strings.
+     */
+    protected static final String UPDATE = "update";
+
+    /**
      * Request properties.
      */
     protected static final String JWT = "jwt";
@@ -21,6 +26,12 @@ public abstract class MeetUpMiddlewareConnection extends MeetUpConnection {
     private String mJwt;
 
     public MeetUpMiddlewareConnection(String jwt) {
+        super();
+        setJwt(jwt);
+    }
+
+    public MeetUpMiddlewareConnection(String url, String jwt) {
+        super(url);
         setJwt(jwt);
     }
 

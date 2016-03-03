@@ -42,8 +42,15 @@ public abstract class MeetUpConnection {
      * Data properties.
      */
     private HttpURLConnection mConnection;
+    private String mUrl;
 
-    public MeetUpConnection() { }
+    public MeetUpConnection() {
+        mUrl = MU_API_URL;
+    }
+
+    public MeetUpConnection(String url) {
+        mUrl = url;
+    }
 
     public int getResponseCode() throws IOException {
         return (mConnection != null) ? mConnection.getResponseCode() : -1;
@@ -51,6 +58,10 @@ public abstract class MeetUpConnection {
 
     protected HttpURLConnection getConnection() {
         return mConnection;
+    }
+
+    protected String getUrl() {
+        return mUrl;
     }
 
     protected String formatURLString(String... args) throws IllegalArgumentException {
@@ -84,7 +95,7 @@ public abstract class MeetUpConnection {
         return connection;
     }
 
-    protected String toStringInputStream(InputStream in) throws Exception {
+    protected String toStringInputStream(InputStream in) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         StringBuilder builder = new StringBuilder();
         String line;
@@ -94,7 +105,7 @@ public abstract class MeetUpConnection {
             builder.append("\n");
         }
 
-        return builder.toString();
+        return builder.toString().trim();
     }
 
     private void setConnection(HttpURLConnection connection) {
