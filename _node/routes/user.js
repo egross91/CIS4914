@@ -24,9 +24,9 @@ router.post('/friends/update', UserController.updateFriends);
 router.get('/groups', UserController.getGroups);
 
 /* GET user group information. */
-router.get('/group', UserController.getGroup);
+router.get('/group/:groupId', UserController.getGroup);
 
 /* POST update group information. */
-// router.post('/group/update/:groupId', UserController.updateGroup);
+router.post('/group/update/:groupId', UserController.updateGroup);
 
 module.exports = router;

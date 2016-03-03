@@ -24,8 +24,9 @@ describe("Unit tests for the User Controller", function () {
   var requestMockObj = {
     headers: {
       jwt: mockJwt,
-      groupid: mockGroupId,
       userid: mockGroupMemberOne
+    }, params: {
+      groupId: mockGroupId
     }
   };
   var responseMockObj = {
@@ -49,7 +50,7 @@ describe("Unit tests for the User Controller", function () {
   });
 
   it("should return 204 error if no one is found - getGroup().", function (done) {
-    requestMockObj.headers.groupid = -1; // Should never exist.
+    requestMockObj.params.groupId = -1; // Should never exist.
 
     setTimeout(function () {
       UserController.getGroup(requestMockObj, responseMockObj);
@@ -62,7 +63,7 @@ describe("Unit tests for the User Controller", function () {
   });
 
   it("should return a 500 error if an integer is not supplied for 'groupid' - getGroup().", function (done) {
-    requestMockObj.headers.groupid = "fail";
+    requestMockObj.params.groupId = "fail";
 
     setTimeout(function () {
       UserController.getGroup(requestMockObj, responseMockObj);

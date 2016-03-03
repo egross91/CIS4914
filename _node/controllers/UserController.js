@@ -79,10 +79,33 @@ exports.getGroups = function (req, res, err) {
  * @summary: Retrieves the group's information (members, locations, etc.) from the DB.
  **/
 exports.getGroup = function (req, res, err) {
-  var data    = req.headers.groupid;
+  var data    = req.params.groupId;
   var handler = ErrorHelper.getHandler();
 
   UserDA.getGroup(data, function (err, userData) {
+    ErrorHelper.mergeMessages(handler, err.statusCode, err);
+    res.statusCode = handler.statusCode;
+
+    if (err.hasErrors) {
+      res.send(handler);
+    } else {
+      res.send(userData);
+    }
+  });
+};
+
+/**
+ * @param req: HTTP request.
+ * @param res: HTTP response.
+ * @param err: HTTP err.
+ * @summary: Update the specified user's group information in the DB.
+ **/
+exports.updateGroup = function (req, res, err) {
+  var data     = req.headers;
+  var handler  = ErrorHelper.getHandler();
+  data.groupId = req.params.groupId;
+
+  UserDA.updateGroup(data, function (err, userData) {
     ErrorHelper.mergeMessages(handler, err.statusCode, err);
     res.statusCode = handler.statusCode;
 

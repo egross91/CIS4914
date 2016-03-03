@@ -120,6 +120,7 @@ exports.getGroups = function (data, send) {
   });
 };
 
+
 /**
  * @param data: GroupId user request.
  * @param send: Callback - to be called on error or success.
@@ -153,6 +154,38 @@ exports.getGroup = function (data, send) {
           }
         }
       })
+    }
+  });
+};
+
+/**
+ * @param data: Contains both headers and the groupId from params.
+ * @param send: Callback - to be called on error or success.
+ * @summary: Update the specified user's group information in the DB.
+ **/
+exports.updateGroup = function (data, send) {
+  var errorHandler = ErrorHelper.getHandler();
+  var groupId      = data.groupId;
+  var groupMembers = '{' + data.groupmembers + '}';
+
+  Postgres.connect(postgresConnectionString, function (err, client, done) {
+    if (err) {
+      ErrorHelper.mergeMessages(errorHandler, 500, err); // Internal Server Error.
+      send(errorHandler);
+    } else {
+      var preparedStatement = "SELECT * " +
+                              "FROM user_groups_upsert($1::int, $2::int[]);";
+      var inserts           = [ groupId, groupMembers ];
+
+      client.query(preparedStatement, inserts, function (err, result) {
+        done(); // Close DB connection.
+
+        if (err) {
+          ErrorHelper.mergeMessages(errorHandler, 500, err); // Internal Server Error.
+        }
+
+        send(errorHandler);
+      });
     }
   });
 };
