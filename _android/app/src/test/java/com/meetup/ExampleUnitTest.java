@@ -1,4 +1,4 @@
-package com.example.eric.meetup;
+package com.meetup;
 
 import org.junit.Test;
 
