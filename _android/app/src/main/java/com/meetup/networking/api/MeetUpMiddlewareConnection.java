@@ -37,10 +37,10 @@ public abstract class MeetUpMiddlewareConnection extends MeetUpConnection {
 
     @Override
     public HttpURLConnection openConnection(String url, String requestType) throws MalformedURLException, IOException {
-        HttpURLConnection connection = super.openConnection(url, requestType);
-        connection.setRequestProperty(JWT, getJwt());
+        super.openConnection(url, requestType);
+        setRequestProperty(JWT, getJwt());
 
-        return connection;
+        return getConnection();
     }
 
     protected String getJwt() {

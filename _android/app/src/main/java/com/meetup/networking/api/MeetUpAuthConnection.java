@@ -22,65 +22,55 @@ public class MeetUpAuthConnection extends MeetUpConnection {
     private static final String PASSWORD = "password";
 
     public String login(String email, String password) throws UserNotFoundException, RequestFailedException {
-        HttpURLConnection connection = null;
-        String response = null;
-        String url      = formatURLString(getUrl(), AUTH, LOGIN);
+        String url = formatURLString(getUrl(), AUTH, LOGIN);
 
         try {
-            connection = openConnection(url, MeetUpConnection.POST, email, password);
-            connection.connect();
+            openConnection(url, MeetUpConnection.POST, email, password);
+            connect();
 
             int statusCode = getResponseCode();
             if (statusCode == HttpURLConnection.HTTP_BAD_REQUEST)
                 throw new UserNotFoundException(String.format("%s not found.", email));
             else if (statusCode != HttpURLConnection.HTTP_OK)
-                throw new RequestFailedException(toStringInputStream(getConnection().getErrorStream()));
-
-            response = toStringInputStream(getConnection().getInputStream());
+                throw new RequestFailedException(toStringInputStream(getErrorStream()));
         } catch (UserNotFoundException e) {
             throw e;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         } finally {
-            if (connection != null)
-                connection.disconnect();
+            disconnect();
         }
 
-        return response;
+        return getResponse();
     }
 
     public String register(String email, String password) {
-        HttpURLConnection connection = null;
-        String response = null;
-        String url      = formatURLString(getUrl(), AUTH, REGISTER);
+        String url = formatURLString(getUrl(), AUTH, REGISTER);
 
         try {
-            connection = openConnection(url, MeetUpConnection.POST, email, password);
-            connection.connect();
+            openConnection(url, MeetUpConnection.POST, email, password);
+            connect();
 
             int statusCode = getResponseCode();
             if (statusCode != HttpURLConnection.HTTP_OK)
                 throw new RequestFailedException(String.format("Failed to register %s.", email));
-
-            response = toStringInputStream(connection.getInputStream());
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         } finally {
-            if (connection != null)
-                connection.disconnect();
+            disconnect();
         }
 
-        return response;
+        return getResponse();
     }
 
     private HttpURLConnection openConnection(String url, String requestType,
                                              String email, String password) throws MalformedURLException, IOException {
-        HttpURLConnection connection = super.openConnection(url, requestType);
-        connection.setRequestProperty(EMAIL, email);
-        connection.setRequestProperty(PASSWORD, password);
+        super.openConnection(url, requestType);
+        setRequestProperty(EMAIL, email);
+        setRequestProperty(PASSWORD, password);
 
-        return connection;
+        return getConnection();
     }
 }

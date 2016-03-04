@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -13,6 +14,7 @@ import java.net.URL;
 public abstract class MeetUpConnection {
     // TODO: Fix to not be localhost.
     protected static final String MU_API_URL = "10.0.2.2"; // IP to access host machine's IP address from Android device - http://juristr.com/blog/2009/10/accessing-host-machine-from-your/
+    protected static final String PROVIDER   = "MeetUp";
 
     /**
      * Request type strings.
@@ -43,6 +45,7 @@ public abstract class MeetUpConnection {
      */
     private HttpURLConnection mConnection;
     private String mUrl;
+    private String mResponse;
 
     public MeetUpConnection() {
         mUrl = MU_API_URL;
@@ -54,6 +57,40 @@ public abstract class MeetUpConnection {
 
     public int getResponseCode() throws IOException {
         return (mConnection != null) ? mConnection.getResponseCode() : -1;
+    }
+
+    public InputStream getInputStream() throws IOException {
+        return mConnection.getInputStream();
+    }
+
+    public InputStream getErrorStream() {
+        return mConnection.getErrorStream();
+    }
+
+    public OutputStream getOutputStream() throws IOException {
+        return mConnection.getOutputStream();
+    }
+
+    public void disconnect() {
+        if (mConnection != null) {
+            mConnection.disconnect();
+        }
+    }
+
+    public void setRequestProperty(String prop, String value) {
+        mConnection.setRequestProperty(prop, value);
+    }
+
+    public void connect() throws IOException {
+        mConnection.connect();
+
+        if (getResponseCode() == HttpURLConnection.HTTP_OK) {
+            setResponse(toStringInputStream(getInputStream()));
+        }
+    }
+
+    public String getResponse() {
+        return mResponse;
     }
 
     protected HttpURLConnection getConnection() {
@@ -110,5 +147,9 @@ public abstract class MeetUpConnection {
 
     private void setConnection(HttpURLConnection connection) {
         mConnection = connection;
+    }
+
+    private void setResponse(String res) {
+        mResponse = res;
     }
 }
