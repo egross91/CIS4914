@@ -32,7 +32,7 @@ app.use(express.static(path.join(__dirname, 'public')));
  * Setup endpoints to routes.
  **/
 app.use('/auth', auth);
-app.use('/loc', loc);
+app.use('/location', loc);
 app.use('/user', user);
 
 // catch 404 and forward to error handler

@@ -1,11 +1,17 @@
 'use strict';
 
 var express = require('express');
-var router = express.Router();
+var router  = express.Router();
 
-var LocationController = require('../controllers/LocationController');
+/**
+ * Modules.
+ **/
+var LocationController   = require('../controllers/LocationController');
 var MiddlewareController = require('../controllers/MiddlewareController');
 
+/**
+ * Middleware.
+ **/
 router.use(MiddlewareController.checkToken);
 router.use(MiddlewareController.updateIP);
 
