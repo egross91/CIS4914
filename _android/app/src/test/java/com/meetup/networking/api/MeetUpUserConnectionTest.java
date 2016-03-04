@@ -41,7 +41,7 @@ public class MeetUpUserConnectionTest {
         JSONObject onlyFriend = friends.getJSONObject(0);
 
         // Assert.
-        assertTrue(onlyFriend.getInt(FRIENDID) == mSecondUser);
+        assertEquals(onlyFriend.getInt(FRIENDID), mSecondUser);
     }
 
     @Test
@@ -50,13 +50,25 @@ public class MeetUpUserConnectionTest {
         MeetUpUserConnection connection = new MeetUpUserConnection(HOST_NAME, mJwt);
 
         // Execute.
-        JSONArray groupMembers = connection.getGroup(1);
+        JSONArray groupMembers = connection.getGroup(mFirstGroup);
         JSONObject memberOne   = groupMembers.getJSONObject(0);
         JSONObject memberTwo   = groupMembers.getJSONObject(1);
 
         // Assert.
-        assertTrue(memberOne.getInt(USERID) == mFirstUser);
-        assertTrue(memberTwo.getInt(USERID) == mSecondUser);
+        assertEquals(memberOne.getInt(USERID), mFirstUser);
+        assertEquals(memberTwo.getInt(USERID), mSecondUser);
+    }
+
+    @Test
+    public void meetUpUserConnection_GetGroup_ReturnsNull() throws Exception {
+        // Setup.
+        MeetUpUserConnection connection = new MeetUpUserConnection(HOST_NAME, mJwt);
+
+        // Execute.
+        JSONArray groupMembers = connection.getGroup(-1); // Should never exist.
+
+        // Assert.
+        assertNull(groupMembers);
     }
 
     @Test
@@ -68,7 +80,7 @@ public class MeetUpUserConnectionTest {
         JSONArray userGroups = connection.getGroups();
 
         // Assert.
-        assertTrue(userGroups.getJSONObject(0).getInt(GROUPID) == mFirstGroup);
-        assertTrue(userGroups.getJSONObject(1).getInt(GROUPID) == mSecondGroup);
+        assertEquals(userGroups.getJSONObject(0).getInt(GROUPID), mFirstGroup);
+        assertEquals(userGroups.getJSONObject(1).getInt(GROUPID), mSecondGroup);
     }
 }
