@@ -6,3 +6,4 @@
 \i ../stored_procedures/UserGroupsInfo.sql;
 \i ../stored_procedures/UserFriendsUpsert.sql;
 \i ../stored_procedures/UserGroupsUpsert.sql;
+\i ../stored_procedures/UserLocationUpsert.sql;
