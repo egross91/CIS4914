@@ -22,7 +22,6 @@ module.exports = function (io) {
 
       // Update the location in the database.
       LocationDA.updateUserLocation(data, function (err, result) {
-        console.log(err);
       	if (err.hasErrors) {
       		io.of(groupsRoom).to(socket.id).emit('failedlocationupdate', err);
       	}

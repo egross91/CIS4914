@@ -69,7 +69,6 @@ exports.updateUserLocation = function (data, send) {
   var userData     = {};
   var errorHandler = ErrorHelper.getHandler();
   var userId       = JWT.decode(data.jwt, jwtSecret).userId;
-  console.log(userId);
 
   Postgres.connect(postgresConnectionString, function (err, client, done) {
     if (err) {
