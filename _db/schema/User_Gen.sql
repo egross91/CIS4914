@@ -4,4 +4,5 @@ CREATE TABLE User_Gen (
 	nameLast  VARCHAR(70),
 	FOREIGN KEY (userId)
 		REFERENCES User_Pers(userId) ON DELETE CASCADE
+									 ON UPDATE CASCADE
 );

@@ -4,4 +4,5 @@ CREATE TABLE User_Loc (
 	latitude  NUMERIC(7, 4), -- ABC.WXYZ
 	FOREIGN KEY (userId)
 		REFERENCES User_Pers(userId) ON DELETE CASCADE
+									 ON UPDATE CASCADE
 );
