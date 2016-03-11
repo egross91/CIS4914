@@ -18,5 +18,7 @@ router.use(MiddlewareController.updateIP);
 /* GET user location by id. */
 router.get('/:userId', LocationController.getUserLocation);
 
+/* POST update user location. */
+router.post('/update', LocationController.updateUserLocation);
 
 module.exports = router;

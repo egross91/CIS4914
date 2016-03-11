@@ -5,11 +5,13 @@
  */
 var Postgres    = require('pg');
 var ErrorHelper = require('../helpers/ErrorHelper');
+var JWT         = require('jsonwebtoken');
 
 /**
  * Static strings.
  **/ 
 var postgresConnectionString = process.env.MU_CONN_STR;
+var jwtSecret                = process.env.MU_JWT_SECRET;
 
 /**
  * @param data: Data from user request.
@@ -50,6 +52,41 @@ exports.getUserLocation = function (data, send) {
             ErrorHelper.addMessages(errorHandler, 520, "Something went wrong with getting location data."); // Unknown Error.
           }
         }
+
+        send(errorHandler, userData);
+      });
+    }
+  });
+};
+
+/**
+ * @param data: Data from user request.
+ * @param send: Callback.
+ * @summary: Updates the location for the userId that
+ *           is supplied in the @data.
+ **/
+exports.updateUserLocation = function (data, send) {
+  var userData     = {};
+  var errorHandler = ErrorHelper.getHandler();
+  var userId       = JWT.decode(data.jwt, jwtSecret).userId;
+  console.log(userId);
+
+  Postgres.connect(postgresConnectionString, function (err, client, done) {
+    if (err) {
+      ErrorHelper.mergeMessages(errorHandler, 500, err); // Internal Server Error.
+      send(errorHandler);
+    } else {
+      var preparedStatement = "SELECT * " + 
+                              "FROM user_location_upsert($1::int, $2::numeric, $3::numeric);";
+      var inserts           = [ userId, data.longitude, data.latitude ];
+
+      client.query(preparedStatement, inserts, function (err, result) {
+        done();
+
+        if (err) {
+          ErrorHelper.mergeMessages(errorHandler, 500, err); // Internal Server Error.
+        }
+        userData = result;
 
         send(errorHandler, userData);
       });

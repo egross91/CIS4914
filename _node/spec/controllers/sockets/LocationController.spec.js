@@ -9,6 +9,7 @@ describe("Socket Location Controller tests", function () {
   /**
    * Mock strings.
    */
+  var testJWT     = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lZmlyc3QiOiJ0ZXN0QHRlc3QubmV0IiwibmFtZWxhc3QiOm51bGwsInVzZXJJZCI6IjE4IiwiaWF0IjoxNDU3NzM2Mzk2fQ.eU3WqLSKTr-Y3_wcnxb4NWTQRNycHgfjC0uS6BTWazg";
   var host        = "http://localhost:3000";
   var groupsRoom  = "/groups";
 
@@ -40,12 +41,13 @@ describe("Socket Location Controller tests", function () {
     testSocket3.disconnect();
   });
 
-  it("should connect to the socket server and print 'lol'", function (done) {
+  it("should connect to the socket server and emit to appropriate sockets within same group", function (done) {
     // Mock group location information to be pushed.
     var locationMockGroup1 = {
       latitude: 100.000,
       longitude: -100.000,
-      groupId: 1
+      groupId: 1,
+      jwt: testJWT
     };
     var locationMockGroup2 = {
       latitude: 1.000,

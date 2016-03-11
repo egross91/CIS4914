@@ -27,3 +27,25 @@ exports.getUserLocation = function (req, res, err) {
 		}
 	});
 };
+
+/**
+ * @param req: HTTP request.
+ * @param res: HTTP response.
+ * @param err: HTTP err.
+ * @summary: Updates the specified user's location in the DB.
+ **/
+exports.updateUserLocation = function (req, res, err) {
+  var handler = ErrorHelper.getHandler();
+  var data    = req.headers;
+
+  LocationDA.updateUserLocation(data, function (err, userData) {
+    ErrorHelper.mergeMessages(handler, err.statusCode, err);
+    res.statusCode = handler.statusCode;
+
+    if (err.hasErrors) {
+      res.send(handler);
+    } else {
+      res.send(userData);
+    }
+  });
+};

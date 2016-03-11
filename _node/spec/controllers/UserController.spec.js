@@ -9,7 +9,7 @@ describe("Unit tests for the User Controller", function () {
   /**
    * Static strings.
    **/
-  var mockJwt       = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lZmlyc3QiOiJ0ZXN0QHRlc3QubmV0IiwibmFtZWxhc3QiOm51bGwsInVzZXJJZCI6IjE4IiwiaWF0IjoxNDU2MjAyMDM0fQ.lDn0aw7Zpo0knv8Xcb6fQWKZOzjK0ZHvuZiRqr9oLG8";
+  var mockJwt       = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lZmlyc3QiOiJ0ZXN0QHRlc3QubmV0IiwibmFtZWxhc3QiOm51bGwsInVzZXJJZCI6IjE4IiwiaWF0IjoxNDU3NzM2Mzk2fQ.eU3WqLSKTr-Y3_wcnxb4NWTQRNycHgfjC0uS6BTWazg";
   var mockGroupId   = 1;
   var mockGroupDesc = "world";
   var mockGroupName = "hello";

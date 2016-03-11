@@ -13,7 +13,7 @@ describe("Unit test for Middleware Controller", function () {
    var expiredTestJWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lRmlyc3QiOiJ0ZXN0QHRlc3QuY29tIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNDU1MDQ5Njg4LCJleHAiOjE0NTUwNTY4ODh9.rnHix0ao4dDwaf6qaf8Cv67NBXNYlOhHd7oRRG-YrDc";
    var expiredJWTStr = "jwt expired";
 
-   var testJWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lRmlyc3QiOiJ0ZXN0QHRlc3QuY29tIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNDU1MjI2NjE2fQ.gAr7tEh_d3sq4NmsSbo_rlW1cdIchCkQFq00VU4gNvI";
+   var testJWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lZmlyc3QiOiJ0ZXN0QHRlc3QubmV0IiwibmFtZWxhc3QiOm51bGwsInVzZXJJZCI6IjE4IiwiaWF0IjoxNDU3NzM2Mzk2fQ.eU3WqLSKTr-Y3_wcnxb4NWTQRNycHgfjC0uS6BTWazg";
 
 	/**
 	 * Object mocks.
