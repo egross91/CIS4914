@@ -13,12 +13,18 @@ describe("Socket Location Controller tests", function () {
   var host        = "http://localhost:3000";
   var groupsRoom  = "/groups";
 
+  var testMessage = "Hello world!";
+
   /**
    * Mock objects.
    */
   var testSocket1 = {};
   var testSocket2 = {};
   var testSocket3 = {};
+  var testUser1   = {
+    nameFirst: "first",
+    nameLast:  "last"
+  }
 
   /**
    * Pre-test(s) setup.
@@ -44,22 +50,31 @@ describe("Socket Location Controller tests", function () {
   it("should connect to the socket server and emit to appropriate sockets within same group", function (done) {
     // Mock group location information to be pushed.
     var locationMockGroup1 = {
-      latitude: 100.000,
-      longitude: -100.000,
-      groupId: 1,
-      jwt: testJWT
+      latitude: 100.111,
+      longitude: -100.111,
+      jwt: testJWT,
+      groupId: 1
     };
     var locationMockGroup2 = {
-      latitude: 1.000,
-      longitude: -1.0000,
+      latitude: 1.999,
+      longitude: -1.999,
+      jwt: testJWT,
       groupId: 2
     };
+    var messageMockGroup1 = {
+      groupId: 1,
+      sender: testUser1,
+      jwt: testJWT,
+      message: testMessage
+    };
+
 
     // Setup users in groups.
     testSocket1.emit('joingroup', locationMockGroup1);
     testSocket2.emit('joingroup', locationMockGroup1);
     testSocket3.emit('joingroup', locationMockGroup2);
     testSocket1.emit('locationpush', locationMockGroup1);
+    testSocket1.emit('messagepush', messageMockGroup1);
 
     // What happens when the information is pushed to group.
     testSocket3.on('locationreceived', function (data) {
@@ -70,6 +85,12 @@ describe("Socket Location Controller tests", function () {
     });
     testSocket2.on('locationreceived', function (data) {
       expect(data.latitude).toBe(locationMockGroup1.latitude);
+    });
+
+    testSocket2.on('messagereceived', function (data) {
+      expect(data.message).toBe(messageMockGroup1.message);
+      expect(data.sender.nameFirst).toBe(testUser1.nameFirst);
+      expect(data.sender.nameLast).toBe(testUser1.nameLast);
       done();
     });
   });

@@ -17,6 +17,7 @@ module.exports = function (io) {
       socket.join(data.groupId);
     });
 
+    // Location synchronizing.
     socket.on('locationpush', function (data) {
       // Send location to everyone within the room (group on client side).
       io.of(groupsRoom).to(data.groupId).emit('locationreceived', data);
@@ -27,6 +28,11 @@ module.exports = function (io) {
       		io.of(groupsRoom).to(socket.id).emit('failedlocationupdate', err);
       	}
       });
+    });
+
+    // Instant messaging.
+    socket.on('messagepush', function (data) {
+      io.of(groupsRoom).to(data.groupId).emit('messagereceived', data);
     });
   });
 };
