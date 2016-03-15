@@ -4,7 +4,6 @@ import android.location.Location;
 
 import java.net.HttpURLConnection;
 
-import com.github.nkzawa.socketio.client.Socket;
 import com.meetup.errorhandling.RequestFailedException;
 
 import org.json.JSONObject;
@@ -24,7 +23,6 @@ public class MeetUpLocationConnection extends MeetUpMiddlewareConnection {
     /**
      * Data properties.
      */
-    private Socket mUserSocket;
 
     public MeetUpLocationConnection(String jwt) {
         super(jwt);
