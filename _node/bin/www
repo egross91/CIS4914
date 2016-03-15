@@ -36,7 +36,7 @@ server.on('listening', onListening);
  
 io.serveClient(false);
 io.attach(server);
-require('../controllers/sockets/LocationController')(io);
+require('../controllers/sockets/GroupsController')(io);
 
 /**
  * Normalize a port into a number, string, or false.

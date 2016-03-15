@@ -12,6 +12,7 @@ var groupsRoom = "/groups";
 
 module.exports = function (io) {
 	var groups = io.of(groupsRoom).on('connection', function (socket) {
+
     socket.on('joingroup', function (data) {
       socket.join(data.groupId);
     });
