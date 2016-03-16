@@ -22,8 +22,8 @@ describe("Socket Location Controller tests", function () {
   var testSocket2 = {};
   var testSocket3 = {};
   var testUser1   = {
-    nameFirst: "first",
-    nameLast:  "last"
+    nameFirst: "test@test.net",
+    nameLast:  null
   }
 
   /**
@@ -63,7 +63,6 @@ describe("Socket Location Controller tests", function () {
     };
     var messageMockGroup1 = {
       groupId: 1,
-      sender: testUser1,
       jwt: testJWT,
       message: testMessage
     };
