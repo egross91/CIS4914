@@ -3,6 +3,7 @@ package com.meetup.networking.api.sockets;
 import android.location.Location;
 
 import com.meetup.errorhandling.RequestFailedException;
+import com.meetup.interfaces.GroupSocketCallbacks;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,102 +31,105 @@ public class MeetUpGroupSocket extends MeetUpSocket {
     public static final String LONGITUDE  = "longitude";
     public static final String LATITUDE   = "latitude";
     public static final String JWT        = "jwt";
-                public static final String MESSAGE    = "message";
-                public static final String NAME_FIRST = "nameFirst";
-                public static final String NAME_LAST  = "nameLast";
-                public static final String SENDER     = "sender";
+    public static final String MESSAGE    = "message";
+    public static final String NAME_FIRST = "nameFirst";
+    public static final String NAME_LAST  = "nameLast";
+    public static final String SENDER     = "sender";
 
-                /**
-                 * Data properties.
-                 */
-                private GroupSocketCallbacks mTarget;
+    /**
+     * Data properties.
+     */
+    private GroupSocketCallbacks mTarget;
 
-                public MeetUpGroupSocket() throws URISyntaxException {
-                    super(MU_SERVER + GROUPS_ROOM);
-                }
+    public MeetUpGroupSocket() throws URISyntaxException {
+        super(MU_SERVER + GROUPS_ROOM);
+    }
 
-                public MeetUpGroupSocket(String url) throws URISyntaxException {
-                    super(url);
-                }
+    public MeetUpGroupSocket(String url) throws URISyntaxException {
+        super(url);
+    }
 
-                public MeetUpGroupSocket(GroupSocketCallbacks task) throws URISyntaxException {
-                    super(MU_SERVER + GROUPS_ROOM);
-                    setTarget(task);
-                }
+    public MeetUpGroupSocket(GroupSocketCallbacks task) throws URISyntaxException {
+        super(MU_SERVER + GROUPS_ROOM);
+        setTarget(task);
+    }
 
-                public MeetUpGroupSocket(String url, GroupSocketCallbacks task) throws URISyntaxException {
-                    super(url);
-                    setTarget(task);
-                }
+    public MeetUpGroupSocket(String url, GroupSocketCallbacks task) throws URISyntaxException {
+        super(url);
+        setTarget(task);
+    }
 
-            public void setTarget(GroupSocketCallbacks target) {
-                mTarget = target;
-            }
+    public void setTarget(GroupSocketCallbacks target) {
+        mTarget = target;
+    }
 
-            protected GroupSocketCallbacks getTarget() {
-                return mTarget;
-            }
+    protected GroupSocketCallbacks getTarget() {
+        return mTarget;
+    }
 
-            public void sendMessage(String jwt, String groupId, String message) throws RequestFailedException {
-                try {
-                    JSONObject sendData = new JSONObject();
-                    prepareData(sendData, jwt, groupId);
-                    sendData.put(MESSAGE, message);
+    public void sendMessage(String jwt, String groupId, String message) throws RequestFailedException {
+        try {
+            JSONObject sendData = new JSONObject();
+            prepareData(sendData, jwt, groupId);
+            sendData.put(MESSAGE, message);
 
-                    emit(MESSAGE_PUSH, sendData);
-                } catch (JSONException e) {
-                    throw new RequestFailedException(e);
-                }
-            }
+            emit(MESSAGE_PUSH, sendData);
+        } catch (JSONException e) {
+            throw new RequestFailedException(e);
+        }
+    }
 
-            public void sendLocation(String jwt, String groupId, Location location) throws RequestFailedException {
-                try {
-                    JSONObject sendData     = new JSONObject();
-                    JSONObject locationData = new JSONObject();
+    public void sendLocation(String jwt, String groupId, Location location) throws RequestFailedException {
+        try {
+            JSONObject sendData     = new JSONObject();
+            JSONObject locationData = new JSONObject();
 
-                    locationData.put(LONGITUDE, location.getLongitude());
-                    locationData.put(LATITUDE, location.getLatitude());
+            locationData.put(LONGITUDE, location.getLongitude());
+            locationData.put(LATITUDE, location.getLatitude());
 
-                    prepareData(sendData, jwt, groupId);
-                    sendData.put(LOCATION, locationData);
+            prepareData(sendData, jwt, groupId);
+            sendData.put(LOCATION, locationData);
 
-                    emit(LOCATION_PUSH, sendData);
-                } catch (JSONException e) {
-                    throw new RequestFailedException(e);
-                }
-            }
+            emit(LOCATION_PUSH, sendData);
+        } catch (JSONException e) {
+            throw new RequestFailedException(e);
+        }
+    }
 
+    @Override
+    protected void initSocket() {
+        super.initSocket();
+
+        on(MESSAGE_RECEIVED, new Emitter.Listener() {
             @Override
-            protected void initSocket() {
-                super.initSocket();
+            public void call(Object... args) {
+                JSONObject response = (JSONObject) args[0];
 
-                on(MESSAGE_RECEIVED, new Emitter.Listener() {
-                    @Override
-                    public void call(Object... args) {
-                        JSONObject response = (JSONObject) args[0];
-
-                        getTarget().onNewMessage(response);
-                    }
-                });
-
-                on(LOCATION_RECEIVED, new Emitter.Listener() {
-                    @Override
-                    public void call(Object... args) {
-                        JSONObject response = (JSONObject) args[0];
-
-                        getTarget().onNewLocation(response);
-                    }
-                });
-
-                on(FAILED_LOCATION_UPDATE, new Emitter.Listener() {
-                    @Override
-                    public void call(Object... args) {
-                        JSONObject error = (JSONObject) args[0];
-
-                getTarget().onFailedLocationUpdate(error);
+                if (getTarget() != null)
+                    getTarget().onNewMessage(response);
             }
         });
-    }
+
+        on(LOCATION_RECEIVED, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                JSONObject response = (JSONObject) args[0];
+
+                if (getTarget() != null)
+                    getTarget().onNewLocation(response);
+            }
+        });
+
+        on(FAILED_LOCATION_UPDATE, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                JSONObject error = (JSONObject) args[0];
+
+                if (getTarget() != null)
+                    getTarget().onFailedLocationUpdate(error);
+            }
+        });
+     }
 
     /**
      * Should be called before and/or after _nearly_ every network call.

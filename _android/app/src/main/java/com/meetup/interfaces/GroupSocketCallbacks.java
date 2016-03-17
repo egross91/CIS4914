@@ -1,4 +1,4 @@
-package com.meetup.networking.api.sockets;
+package com.meetup.interfaces;
 
 import org.json.JSONObject;
 

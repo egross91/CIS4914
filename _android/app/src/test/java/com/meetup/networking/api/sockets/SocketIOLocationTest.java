@@ -4,6 +4,7 @@ import android.location.Location;
 import android.location.LocationManager;
 
 import com.meetup.errorhandling.RequestFailedException;
+import com.meetup.interfaces.GroupSocketCallbacks;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -133,10 +134,5 @@ public class SocketIOLocationTest {
         public boolean isLocationCalled() { return mLocationIsCalled; }
 
         public boolean isMessageCalled() { return mMessageIsCalled; }
-
-        @Override
-        public String toString() {
-            return String.format("isLocationCalled: %b", mLocationIsCalled);
-        }
     }
 }
