@@ -13,6 +13,8 @@ describe("Unit tests for the User Controller", function () {
   var mockGroupId   = 1;
   var mockGroupDesc = "world";
   var mockGroupName = "hello";
+  var mockNameFirst1 = "test@test.net";
+  var mockNameLast1  = null;
 
   var mockGroupMemberOne = 18;
   var mockGroupMemberTwo = 19;
@@ -33,6 +35,10 @@ describe("Unit tests for the User Controller", function () {
     send: function (data) {
       result = data;
     }
+  };
+  var testUser1       = {
+    nameFirst: mockNameFirst1,
+    nameLast: mockNameLast1
   };
 
   // TODO: Create beforeAll() & afterAll() to create and clean mock data in DB.
@@ -84,6 +90,34 @@ describe("Unit tests for the User Controller", function () {
         expect(result[0].namefirst).toBeTruthy(); // Does not come back in a particular order.
         done();
       }, 400);
+    }, 100);
+  });
+
+  it("return user(s) if they have the first and last name being queried", function (done) {
+    requestMockObj.headers.user = testUser1;
+
+    setTimeout(function () {
+      UserController.findUser(requestMockObj, responseMockObj);
+
+      setTimeout(function () {
+        expect(result.users[0].namefirst).toBe(testUser1.nameFirst);
+        expect(result.users[0].namelast).toBe(testUser1.nameLast);
+        done();
+      }, 100);
+    }, 100);
+  });
+
+  it("return 204 status code if there is no one by the name supplied", function (done) {
+    requestMockObj.headers.user.nameFirst = "";
+    requestMockObj.headers.user.nameFirst = "";
+
+    setTimeout(function () {
+      UserController.findUser(requestMockObj, responseMockObj);
+
+      setTimeout(function () {
+        expect(result.statusCode).toBe(204);
+        done();
+      }, 100);
     }, 100);
   });
 });

@@ -83,6 +83,43 @@ exports.updateFriends = function (data, send) {
   });
 };
 
+exports.findUser = function (data, send) {
+  var nameFirst    = data.user.nameFirst || "";
+  var nameLast     = data.user.nameLast || "";
+  var errorHandler = ErrorHelper.getHandler();
+
+  Postgres.connect(postgresConnectionString, function (err, client, done) {
+    if (err) {
+      ErrorHelper.mergeMessages(errorHandler, 500, err); // Internal Server Error.
+      send(errorHandler);
+    } else {
+      var inserts           = [ ];
+      var preparedStatement = "SELECT * " +
+                              "FROM user_gen " +
+                              "WHERE " + formatNameClause(nameFirst, nameLast, inserts) + ";";
+      var userData          = {};
+
+      client.query(preparedStatement, inserts, function (err, result) {
+        done(); // Close DB connection.
+
+        if (err) {
+          ErrorHelper.mergeMessages(errorHandler, 500, err); // Internal Server Error.
+        } else {
+          if (result.rows.length === 0) {
+            ErrorHelper.addMessages(errorHandler, 204, "User not found.");
+          } else if (result.rows.length > 0) {
+            userData.users = result.rows;
+          } else {
+            ErrorHelper.addMessages(errorHandler, 520, "Something went wrong."); // Unknown Error.
+          }
+        }
+
+        send(errorHandler, userData);
+      });
+    }
+  });
+};
+
 /**
  * @param data: JWT from user request.
  * @param send: Callback - to be called on error or success.
@@ -189,3 +226,26 @@ exports.updateGroup = function (data, send) {
     }
   });
 };
+
+/**
+ * Helper methods.
+ */
+var formatNameClause = function (nameFirst, nameLast, inserts) {
+    var opts = [];
+
+    if (nameFirst) {
+      opts.push("nameFirst=$" + (inserts.length + 1) + "::text");
+      inserts.push(nameFirst);
+    } else {
+      opts.push("nameFirst is null");
+    }
+
+    if (nameLast) {
+      opts.push("nameLast=$" + (inserts.length + 1) + "::text");
+      insert.push(nameLast);
+    } else {
+      opts.push("nameLast is null");
+    }
+
+    return opts.join(" AND ");
+  };

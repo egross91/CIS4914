@@ -54,6 +54,28 @@ exports.updateFriends = function (req, res, err) {
  * @param req: HTTP request.
  * @param res: HTTP response.
  * @param err: HTTP err.
+ * @summary: Finds a user based on first and last name.
+ **/
+exports.findUser = function (req, res, err) {
+  var data    = req.headers;
+  var handler = ErrorHelper.getHandler();
+
+  UserDA.findUser(data, function (err, userData) {
+    ErrorHelper.mergeMessages(handler, err.statusCode, err);
+    req.statusCode = handler.statusCode;
+
+    if (err.hasErrors) {
+      res.send(handler);
+    } else {
+      res.send(userData);
+    }
+  });
+};
+
+/**
+ * @param req: HTTP request.
+ * @param res: HTTP response.
+ * @param err: HTTP err.
  * @summary: Retrieves the specified user's groups' information from the DB.
  **/
 exports.getGroups = function (req, res, err) {
