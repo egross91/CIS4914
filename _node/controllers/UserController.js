@@ -12,6 +12,28 @@ var UserDA      = require('../data_accessors/UserDataAccessor');
  * @param err: HTTP err.
  * @summary: Retrieves the specified user's friends' information from the DB.
  **/
+exports.updateUser = function (req, res, err) {
+  var data    = req.headers;
+  var handler = ErrorHelper.getHandler();
+
+  UserDA.updateUser(data, function (err, userData) {
+    ErrorHelper.mergeMessages(handler, err.statusCode, err);
+    res.statusCode = handler.statusCode;
+
+    if (err.hasErrors) {
+      res.send(handler);
+    } else {
+      res.send(userData);
+    }
+  });
+};
+
+/**
+ * @param req: HTTP request.
+ * @param res: HTTP response.
+ * @param err: HTTP err.
+ * @summary: Retrieves the specified user's friends' information from the DB.
+ **/
 exports.getFriends = function (req, res, err) {
   var data    = req.headers.jwt;
   var handler = ErrorHelper.getHandler();

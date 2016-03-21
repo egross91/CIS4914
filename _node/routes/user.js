@@ -14,6 +14,8 @@ var MiddlewareController = require('../controllers/MiddlewareController');
 router.use(MiddlewareController.checkToken);
 router.use(MiddlewareController.updateIP); 
 
+/* POST update user information. */
+router.post('/update', UserController.updateUser);
 
 /* GET user's friends. */
 router.get('/friends', UserController.getFriends);

@@ -9,10 +9,10 @@ describe("Unit tests for the User Controller", function () {
   /**
    * Static strings.
    **/
-  var mockJwt       = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lZmlyc3QiOiJ0ZXN0QHRlc3QubmV0IiwibmFtZWxhc3QiOm51bGwsInVzZXJJZCI6IjE4IiwiaWF0IjoxNDU3NzM2Mzk2fQ.eU3WqLSKTr-Y3_wcnxb4NWTQRNycHgfjC0uS6BTWazg";
-  var mockGroupId   = 1;
-  var mockGroupDesc = "world";
-  var mockGroupName = "hello";
+  var mockJwt        = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lZmlyc3QiOiJ0ZXN0QHRlc3QubmV0IiwibmFtZWxhc3QiOm51bGwsInVzZXJJZCI6IjE4IiwiaWF0IjoxNDU3NzM2Mzk2fQ.eU3WqLSKTr-Y3_wcnxb4NWTQRNycHgfjC0uS6BTWazg";
+  var mockGroupId    = 1;
+  var mockGroupDesc  = "world";
+  var mockGroupName  = "hello";
   var mockNameFirst1 = "test@test.net";
   var mockNameLast1  = null;
 
@@ -26,7 +26,8 @@ describe("Unit tests for the User Controller", function () {
   var requestMockObj = {
     headers: {
       jwt: mockJwt,
-      userid: mockGroupMemberOne
+      userid: mockGroupMemberOne,
+      updateInfo: { }
     }, params: {
       groupId: mockGroupId
     }
@@ -41,6 +42,16 @@ describe("Unit tests for the User Controller", function () {
     nameLast: mockNameLast1
   };
 
+  afterEach(function (done) {
+    requestMockObj.headers.updateInfo.nameFirst = mockNameFirst1;
+    requestMockObj.headers.updateInfo.nameLast  = mockNameLast1;
+
+    setTimeout(function () {
+      UserController.updateUser(requestMockObj, responseMockObj);
+      done();
+    }, 100);
+  });
+
   // TODO: Create beforeAll() & afterAll() to create and clean mock data in DB.
 
   it("should return the group information when sending the 'groupid' - getGroup().", function (done) {
@@ -48,8 +59,12 @@ describe("Unit tests for the User Controller", function () {
       UserController.getGroup(requestMockObj, responseMockObj);
 
       setTimeout(function () {
-        expect(result[0].userid).toBe(mockGroupMemberOne);
-        expect(result[1].userid).toBe(mockGroupMemberTwo);
+        expect(result).toContain(jasmine.objectContaining({
+          userid: mockGroupMemberOne
+        }));
+        expect(result).toContain(jasmine.objectContaining({
+          userid: mockGroupMemberTwo
+        }));
         done();
       }, 400)
     }, 100);
@@ -116,6 +131,20 @@ describe("Unit tests for the User Controller", function () {
 
       setTimeout(function () {
         expect(result.statusCode).toBe(204);
+        done();
+      }, 100);
+    }, 100);
+  });
+
+  it("should return 'true' when it updates successfully.", function (done) {
+    requestMockObj.headers.updateInfo.nameFirst = "new first";
+    requestMockObj.headers.updateInfo.nameLast  = "new last";
+
+    setTimeout(function () {
+      UserController.updateUser(requestMockObj, responseMockObj);
+
+      setTimeout(function () {
+        expect(result).toBe(true);
         done();
       }, 100);
     }, 100);

@@ -13,6 +13,35 @@ var ErrorHelper = require('../helpers/ErrorHelper');
  var postgresConnectionString = process.env.MU_CONN_STR;
  var jwtSecret                = process.env.MU_JWT_SECRET;
 
+exports.updateUser = function (data, send) {
+  var errorHandler    = ErrorHelper.getHandler();
+  var userData        = JWT.decode(data.jwt);
+  userData.updateInfo = data.updateInfo;
+
+  Postgres.connect(postgresConnectionString, function (err, client, done) {
+    if (err) {
+      ErrorHelper.mergeMessages(errorHandler, 500, err);
+      send(errorHandler);
+    } else {
+      var preparedStatement = "UPDATE user_gen " +
+                              "SET nameFirst=$1, nameLast=$2 " +
+                              "WHERE userId=$3::int;";
+      var inserts           = [ userData.updateInfo.nameFirst, userData.updateInfo.nameLast, userData.userId ];
+
+      client.query(preparedStatement, inserts, function (err, result) {
+        done();
+
+        if (err) {
+          ErrorHelper.mergeMessasges(errorHandler, 500, err); // Internal Server Error.
+          send(errorHandler, false);
+        } else {
+          send(errorHandler, true)
+        }
+      });
+    }
+  });
+};
+
 /**
  * @param data: JWT from user request.
  * @param send: Callback - to be called on error or success.
