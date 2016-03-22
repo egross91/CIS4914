@@ -96,7 +96,7 @@ describe("Unit tests for the User Controller", function () {
     }, 100);
   });
 
-  it("should return any friends from for a user - getFriends().", function (done) {
+  it("should return any friends for a user - getFriends().", function (done) {
     setTimeout(function () {
       UserController.getFriends(requestMockObj, responseMockObj);
 

@@ -4,19 +4,16 @@
  * Modules.
  **/
 var Postgres    = require('pg');
-var JWT         = require('jsonwebtoken');
 var ErrorHelper = require('../helpers/ErrorHelper');
 
 /**
  * Static strings.
  **/
- var postgresConnectionString = process.env.MU_CONN_STR;
- var jwtSecret                = process.env.MU_JWT_SECRET;
+var postgresConnectionString = process.env.MU_CONN_STR;
 
 exports.updateUser = function (data, send) {
-  var errorHandler    = ErrorHelper.getHandler();
-  var userData        = JWT.decode(data.jwt);
-  userData.updateInfo = data.updateInfo;
+  var errorHandler = ErrorHelper.getHandler();
+  var userData     = data;
 
   Postgres.connect(postgresConnectionString, function (err, client, done) {
     if (err) {
@@ -49,7 +46,7 @@ exports.updateUser = function (data, send) {
  **/
 exports.getFriends = function (data, send) {
   var errorHandler = ErrorHelper.getHandler();
-  var userData     = JWT.decode(data, jwtSecret);
+  var userData     = data;
 
   Postgres.connect(postgresConnectionString, function (err, client, done) {
     if (err) {
@@ -86,9 +83,9 @@ exports.getFriends = function (data, send) {
  * @summary: Updates the specified user's friends' information in the DB.
  **/
 exports.updateFriends = function (data, send) {
-  var userId       = JWT.decode(data.jwt, jwtSecret).userId;
-  var friendIds    = '{' + data.friendids + '}';
   var errorHandler = ErrorHelper.getHandler();
+  var userData     = data;
+  var friendIds    = '{' + data.friendIds + '}';
 
   Postgres.connect(postgresConnectionString, function (err, client, done) {
     if (err) {
@@ -97,7 +94,7 @@ exports.updateFriends = function (data, send) {
     } else {
       var preparedStatement = "SELECT * " +
                               "FROM user_friends_upsert($1::int, $2::int[]);";
-      var inserts           = [ userId, friendIds ];
+      var inserts           = [ data.userId, friendIds ];
 
       client.query(preparedStatement, inserts, function (err, result) {
         done(); // Clone DB connection.
@@ -113,8 +110,8 @@ exports.updateFriends = function (data, send) {
 };
 
 exports.findUser = function (data, send) {
-  var nameFirst    = data.user.nameFirst || "";
-  var nameLast     = data.user.nameLast || "";
+  var nameFirst    = data.nameFirst || "";
+  var nameLast     = data.nameLast || "";
   var errorHandler = ErrorHelper.getHandler();
 
   Postgres.connect(postgresConnectionString, function (err, client, done) {
@@ -156,7 +153,7 @@ exports.findUser = function (data, send) {
  **/
 exports.getGroups = function (data, send) {
   var errorHandler = ErrorHelper.getHandler();
-  var userData     = JWT.decode(data, jwtSecret);
+  var userData     = data;
 
   Postgres.connect(postgresConnectionString, function (err, client, done) {
     if (err) {
@@ -232,7 +229,7 @@ exports.getGroup = function (data, send) {
 exports.updateGroup = function (data, send) {
   var errorHandler = ErrorHelper.getHandler();
   var groupId      = data.groupId;
-  var groupMembers = '{' + data.groupmembers + '}';
+  var groupMembers = '{' + data.groupMembers + '}';
 
   Postgres.connect(postgresConnectionString, function (err, client, done) {
     if (err) {

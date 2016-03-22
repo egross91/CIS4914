@@ -61,8 +61,9 @@ exports.checkToken = function (req, res, next) {
  * @summary: Updates the user's IP address in the DB.
  **/
 exports.updateIP = function (req, res, next) {
-  var data    = req.headers;
   var handler = ErrorHelper.getHandler();
+  var data    = JWT.decode(req.headers.jwt, jwtSecret) || {};
+  data.ip     = req.headers.ip;
 
   if (!data.ip) {
     ErrorHelper.addMessages(handler, 412, "No IP was found in request."); // Precondition Failed

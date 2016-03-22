@@ -4,8 +4,8 @@
  * Modules.
  **/
 var Postgres       = require('pg');
-var PasswordHasher = require('password-hash');
 var JWT            = require('jsonwebtoken');
+var PasswordHasher = require('password-hash');
 var ErrorHelper    = require('../helpers/ErrorHelper');
 
 /**
@@ -25,8 +25,6 @@ var jwtOptions = { expiresIn: 7200 }; // In Seconds.
  * @return: JSON Webtoken with user session information.
  **/
 exports.register = function (data, send) {
-  var email        = data.email;
-  var rawPassword  = data.password;
   var errorHandler = ErrorHelper.getHandler();
 
   /* Connect to database. */
@@ -42,7 +40,7 @@ exports.register = function (data, send) {
       var queryPreparedStatement = "SELECT email " +
                                    "FROM User_Pers " +
                                    "WHERE email = $1;";
-      var queryInserts           = [ email ];
+      var queryInserts           = [ data.email ];
       var userData               = {};
 
       /** Check if email exists. **/
@@ -57,7 +55,7 @@ exports.register = function (data, send) {
         else {
           if (result.rows.length > 0) {
             /*** User exists. ***/
-            ErrorHelper.addMessages(errorHandler, 409, (email + " already exists! :'(")); // Conflict.
+            ErrorHelper.addMessages(errorHandler, 409, (data.email + " already exists! :'(")); // Conflict.
 
             send(errorHandler, userData);
             done(); // Close DB connection.
@@ -66,8 +64,8 @@ exports.register = function (data, send) {
             var setupPreparedStatement = "SELECT * " +
                                          "FROM setup_user($1, $2) " + 
                                          "AS f(success);";
-            var saltedPassword         = PasswordHasher.generate(rawPassword);
-            var insertInserts          = [ email, saltedPassword ];
+            var saltedPassword         = PasswordHasher.generate(data.password);
+            var insertInserts          = [ data.email, saltedPassword ];
 
             /*** Create new user in database. **/
             client.query(setupPreparedStatement, insertInserts, function (err, result) {
@@ -78,7 +76,7 @@ exports.register = function (data, send) {
               } else {
                 if (result.rows[0].success !== -1) {
                   // Set token data.
-                  userData.email  = userData.nameFirst = email;
+                  userData.email  = userData.nameFirst = data.email;
                   userData.userId = result.rows[0].success;
                   
                   var token = JWT.sign(userData, jwtSecret, jwtOptions);
@@ -108,8 +106,6 @@ exports.register = function (data, send) {
  * @return: JSON Webtoken containing user session information.
  **/
 exports.login = function (data, send) {
-	var email        = data.email;
-	var rawPassword  = data.password;
   var errorHandler = ErrorHelper.getHandler();
 
 	/* Connect to Postgres DB. */
@@ -123,7 +119,7 @@ exports.login = function (data, send) {
       var prelimPreparedStatement = "SELECT userId, password " + 
                                     "FROM User_Pers " +
                                     "WHERE email = $1;";
-      var inserts           = [ email ];
+      var inserts           = [ data.email ];
       var userData          = {};
 
       /** Query for user information. **/
@@ -136,7 +132,7 @@ exports.login = function (data, send) {
         } else {
           if (result.rows.length === 0) {
             /*** User does not exist. ***/
-            ErrorHelper.addMessages(errorHandler, 400, ("User " + email + " does not exist.")); // Bad Request.
+            ErrorHelper.addMessages(errorHandler, 400, ("User " + data.email + " does not exist.")); // Bad Request.
             send(errorHandler);
             done();
           } else if (result.rows.length === 1) {
@@ -147,7 +143,7 @@ exports.login = function (data, send) {
             var userPassword = userData.password;
             delete userData.password; // Don't leave sensitive breadcrumbs.
 
-            if (PasswordHasher.verify(rawPassword, userPassword)) {
+            if (PasswordHasher.verify(data.password, userPassword)) {
               /***** Get the user's name for client purposes. *****/
               var userInfoPreparedStatement = "SELECT nameFirst, nameLast " +
                                               "FROM User_Gen " +
@@ -165,7 +161,7 @@ exports.login = function (data, send) {
                     /******* User info was found - create a JWT. *******/
                     userData        = result.rows[0];
                     userData.userId = userInfoInserts[0];
-                    var token = JWT.sign(userData, jwtSecret, jwtOptions);
+                    var token       = JWT.sign(userData, jwtSecret, jwtOptions);
 
                     send(errorHandler, token);
                     return;

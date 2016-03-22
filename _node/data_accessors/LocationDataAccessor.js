@@ -5,13 +5,11 @@
  */
 var Postgres    = require('pg');
 var ErrorHelper = require('../helpers/ErrorHelper');
-var JWT         = require('jsonwebtoken');
 
 /**
  * Static strings.
  **/ 
 var postgresConnectionString = process.env.MU_CONN_STR;
-var jwtSecret                = process.env.MU_JWT_SECRET;
 
 /**
  * @param data: Data from user request.
@@ -68,7 +66,6 @@ exports.getUserLocation = function (data, send) {
 exports.updateUserLocation = function (data, send) {
   var userData     = {};
   var errorHandler = ErrorHelper.getHandler();
-  var userId       = JWT.decode(data.jwt, jwtSecret).userId;
 
   Postgres.connect(postgresConnectionString, function (err, client, done) {
     if (err) {
@@ -77,17 +74,17 @@ exports.updateUserLocation = function (data, send) {
     } else {
       var preparedStatement = "SELECT * " + 
                               "FROM user_location_upsert($1::int, $2::numeric, $3::numeric);";
-      var inserts           = [ userId, data.longitude, data.latitude ];
+      var inserts           = [ data.userId, data.longitude, data.latitude ];
 
       client.query(preparedStatement, inserts, function (err, result) {
         done();
 
         if (err) {
           ErrorHelper.mergeMessages(errorHandler, 500, err); // Internal Server Error.
+          send(errorHandler, false);
+        } else {
+          send(errorHandler, true);
         }
-        userData = result;
-
-        send(errorHandler, userData);
       });
     }
   });

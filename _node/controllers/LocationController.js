@@ -35,8 +35,10 @@ exports.getUserLocation = function (req, res, err) {
  * @summary: Updates the specified user's location in the DB.
  **/
 exports.updateUserLocation = function (req, res, err) {
-  var handler = ErrorHelper.getHandler();
-  var data    = req.headers;
+  var handler    = ErrorHelper.getHandler();
+  var data       = JWT.decode(req.headers.jwt, jwtSecret);
+  data.longitude = req.headers.longitude;
+  data.latitude  = req.headers.latitude;
 
   LocationDA.updateUserLocation(data, function (err, userData) {
     ErrorHelper.mergeMessages(handler, err.statusCode, err);

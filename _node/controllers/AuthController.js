@@ -1,11 +1,16 @@
 'use strict';
 
+/**
+ * Modules.
+ */
 var AuthDA      = require('../data_accessors/AuthDataAccessor');
 var ErrorHelper = require('../helpers/ErrorHelper');
 
 exports.register = function (req, res, err) {
-	var handler = ErrorHelper.getHandler();
-	var data    = req.headers;
+	var handler   = ErrorHelper.getHandler();
+	var data      = {};
+	data.email    = req.headers.email;
+	data.password = req.headers.password;
 
 	AuthDA.register(data, function (err, userData) {
 		// TODO: Fix DRY.
@@ -21,8 +26,10 @@ exports.register = function (req, res, err) {
 };
 
 exports.login = function (req, res, err) {
-	var handler = ErrorHelper.getHandler();
-	var data    = req.headers;
+	var handler   = ErrorHelper.getHandler();
+	var data      = {};
+	data.email    = req.headers.email;
+	data.password = req.headers.password;
 	
 	AuthDA.login(data, function (err, userData) {
 		ErrorHelper.mergeMessages(handler, err.statusCode, err);
