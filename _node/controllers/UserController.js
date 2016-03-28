@@ -148,19 +148,38 @@ exports.getGroup = function (req, res, err) {
   });
 };
 
+exports.updateGroupInfo = function (req, res, err) {
+  var handler    = ErrorHelper.getHandler();
+  var data       = {};
+  data.groupName = req.headers.groupName;
+  data.groupDesc = req.headers.groupDesc;
+  data.groupId   = req.params.groupId;
+
+  UserDA.updateGroupInfo(data, function (err, userData) {
+    ErrorHelper.mergeMessages(handler, err.statusCode, err);
+    res.statusCode = handler.statusCode;
+
+    if (err.hasErrors) {
+      res.send(handler);
+    } else {
+      res.send(userData);
+    }
+  });
+};
+
 /**
  * @param req: HTTP request.
  * @param res: HTTP response.
  * @param err: HTTP err.
  * @summary: Update the specified user's group information in the DB.
  **/
-exports.updateGroup = function (req, res, err) {
+exports.updateGroupMembers = function (req, res, err) {
   var handler       = ErrorHelper.getHandler();
   var data          = {};
   data.groupMembers = req.headers.groupmembers;
   data.groupId      = req.params.groupId;
 
-  UserDA.updateGroup(data, function (err, userData) {
+  UserDA.updateGroupMembers(data, function (err, userData) {
     ErrorHelper.mergeMessages(handler, err.statusCode, err);
     res.statusCode = handler.statusCode;
 

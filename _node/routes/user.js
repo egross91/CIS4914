@@ -32,7 +32,10 @@ router.get('/groups', UserController.getGroups);
 /* GET user group information. */
 router.get('/group/:groupId', UserController.getGroup);
 
-/* POST update group information. */
-router.post('/group/update/:groupId', UserController.updateGroup);
+/* POST update group informatio */
+router.post('/group/info/update/:groupId', UserController.updateGroupInfo);
+
+/* POST update group members. */
+router.post('/group/members/update/:groupId', UserController.updateGroupMembers);
 
 module.exports = router;

@@ -221,12 +221,36 @@ exports.getGroup = function (data, send) {
   });
 };
 
+exports.updateGroupInfo = function (data, send) {
+  var errorHandler = ErrorHelper.getHandler();
+
+  Postgres.connect(postgresConnectionString, function (err, client, done) {
+    if (err) {
+      ErrorHelper.mergeMessages(errorHandler, 500, err); // Internal Server Error.
+      send(errorHandler, false);
+    } else {
+      var preparedStatement = "SELECT * " +
+                              "FROM groups_info_upsert($1::int, $2::text, $3::text);";
+      var inserts           = [ data.groupId, data.groupName, data.groupDesc ];
+
+      client.query(preparedStatement, inserts, function (err, result) {
+        if (err) {
+          ErrorHelper.mergeMessages(errorHandler, 500, err); // Internal Server Error.
+          send(errorHandler, false);
+        } else {
+          send(errorHandler, true);
+        }
+      });
+    }
+  });
+};
+
 /**
  * @param data: Contains both headers and the groupId from params.
  * @param send: Callback - to be called on error or success.
  * @summary: Update the specified user's group information in the DB.
  **/
-exports.updateGroup = function (data, send) {
+exports.updateGroupMembers = function (data, send) {
   var errorHandler = ErrorHelper.getHandler();
   var groupId      = data.groupId;
   var groupMembers = '{' + data.groupMembers + '}';

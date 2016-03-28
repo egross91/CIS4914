@@ -118,8 +118,8 @@ describe("Unit tests for the User Controller", function () {
         expect(result.users[0].namefirst).toBe(testUser1.nameFirst);
         expect(result.users[0].namelast).toBe(testUser1.nameLast);
         done();
-      }, 100);
-    }, 100);
+      }, 200);
+    }, 200);
   });
 
   it("return 204 status code if there is no one by the name supplied", function (done) {
@@ -142,6 +142,21 @@ describe("Unit tests for the User Controller", function () {
 
     setTimeout(function () {
       UserController.updateUser(requestMockObj, responseMockObj);
+
+      setTimeout(function () {
+        expect(result).toBe(true);
+        done();
+      }, 100);
+    }, 100);
+  });
+
+  it("should update the group info successfully", function (done) {
+    requestMockObj.headers.groupName = "other";
+    requestMockObj.headers.groupDesc = "group";
+    requestMockObj.params.groupId    = 2;
+
+    setTimeout(function () {
+      UserController.updateGroupInfo(requestMockObj, responseMockObj);
 
       setTimeout(function () {
         expect(result).toBe(true);
