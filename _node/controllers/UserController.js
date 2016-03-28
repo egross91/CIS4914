@@ -151,13 +151,14 @@ exports.getGroup = function (req, res, err) {
 exports.updateGroupInfo = function (req, res, err) {
   var handler    = ErrorHelper.getHandler();
   var data       = {};
-  data.groupName = req.headers.groupName;
-  data.groupDesc = req.headers.groupDesc;
+  data.groupName = req.headers.groupname;
+  data.groupDesc = req.headers.groupdesc;
   data.groupId   = req.params.groupId;
 
   UserDA.updateGroupInfo(data, function (err, userData) {
     ErrorHelper.mergeMessages(handler, err.statusCode, err);
     res.statusCode = handler.statusCode;
+    console.log(handler);
 
     if (err.hasErrors) {
       res.send(handler);

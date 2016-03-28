@@ -1,5 +1,7 @@
 package com.meetup.networking.api;
 
+import com.meetup.networking.api.sockets.MeetUpGroupSocket;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -23,6 +25,10 @@ public class MeetUpUserConnectionTest {
     private final int mSecondUser  = 19;
     private final int mFirstGroup  = 1;
     private final int mSecondGroup = 2;
+
+    private final String mGroupName = "other";
+    private final String mGroupDesc = "group";
+
 
     /**
      * JSON properties/
@@ -82,5 +88,17 @@ public class MeetUpUserConnectionTest {
         // Assert.
         assertEquals(userGroups.getJSONObject(0).getInt(GROUPID), mFirstGroup);
         assertEquals(userGroups.getJSONObject(1).getInt(GROUPID), mSecondGroup);
+    }
+
+    @Test
+    public void meetUpUserConnection_UpdateGroupInfo_ReturnsTrue() throws Exception {
+        // Setup.
+        MeetUpUserConnection connection = new MeetUpUserConnection(HOST_NAME, mJwt);
+
+        // Execute.
+        boolean updateOk = connection.updateGroupInfo(mSecondGroup, mGroupName, mGroupDesc);
+
+        // Assert.
+        assertTrue(updateOk);
     }
 }

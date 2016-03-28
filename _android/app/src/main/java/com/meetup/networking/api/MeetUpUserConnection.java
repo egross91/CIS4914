@@ -17,6 +17,8 @@ public class MeetUpUserConnection extends MeetUpMiddlewareConnection {
      */
     protected static final String FRIENDIDS    = "friendids";
     protected static final String GROUPMEMBERS = "groupmembers";
+    protected static final String GROUPNAME    = "groupName";
+    protected static final String GROUPDESC    = "groupDesc";
 
     /**
      * Endpoint strings.
@@ -25,6 +27,8 @@ public class MeetUpUserConnection extends MeetUpMiddlewareConnection {
     private static final String FRIENDS = "friends";
     private static final String GROUPS  = "groups";
     private static final String GROUP   = "group";
+    private static final String MEMBERS = "members";
+    private static final String INFO    = "info";
 
     // Should never be used.
     private MeetUpUserConnection() {
@@ -125,12 +129,34 @@ public class MeetUpUserConnection extends MeetUpMiddlewareConnection {
         }
     }
 
-    public boolean updateGroup(int groupId, List<Integer> idsOfGroupMembers) throws RequestFailedException {
-        String url = formatURLString(getUrl(), USER, GROUP, UPDATE, Integer.toString(groupId));
+    public boolean updateGroupMembers(int groupId, List<Integer> idsOfGroupMembers) throws RequestFailedException {
+        String url = formatURLString(getUrl(), USER, MEMBERS, GROUP, UPDATE, Integer.toString(groupId));
 
         try {
-            openConnection(url);
+            openConnection(url, POST);
             setRequestProperty(GROUPMEMBERS, formatArray(',', idsOfGroupMembers.toArray()));
+            connect();
+
+            int responseCode = getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR)
+                throw new RequestFailedException("Failed to update group members.");
+
+            return (!TextUtils.isEmpty(getResponse()));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            disconnect();
+        }
+    }
+
+    public boolean updateGroupInfo(int groupId, String groupName, String groupDesc) throws RequestFailedException {
+        String url = formatURLString(getUrl(), USER, GROUP, INFO, UPDATE, Integer.toString(groupId));
+
+        try {
+            openConnection(url, POST);
+            setRequestProperty(GROUPNAME, groupName);
+            setRequestProperty(GROUPDESC, groupDesc);
             connect();
 
             int responseCode = getResponseCode();
