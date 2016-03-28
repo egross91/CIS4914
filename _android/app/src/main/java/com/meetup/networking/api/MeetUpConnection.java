@@ -13,8 +13,8 @@ import java.net.URL;
 
 public abstract class MeetUpConnection {
     // TODO: Fix to not be localhost.
-    protected static final String MU_API_URL = "10.0.2.2"; // IP to access host machine's IP address from Android device - http://juristr.com/blog/2009/10/accessing-host-machine-from-your/
-    protected static final String PROVIDER   = "MeetUp";
+    public static final String MU_API_URL  = "10.0.2.2"; // IP to access host machine's IP address from Android device - http://juristr.com/blog/2009/10/accessing-host-machine-from-your/
+    protected static final String PROVIDER = "MeetUp";
 
     /**
      * Request type strings.
