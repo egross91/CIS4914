@@ -158,7 +158,6 @@ exports.updateGroupInfo = function (req, res, err) {
   UserDA.updateGroupInfo(data, function (err, userData) {
     ErrorHelper.mergeMessages(handler, err.statusCode, err);
     res.statusCode = handler.statusCode;
-    console.log(handler);
 
     if (err.hasErrors) {
       res.send(handler);
