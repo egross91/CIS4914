@@ -13,9 +13,14 @@ import android.widget.Toast;
 
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.meetup.Objects.groupObjects;
 import com.meetup.R;
 import com.meetup.helpers.OnDoubleTapHelper;
+import com.meetup.networking.api.MeetUpConnection;
+import com.meetup.networking.api.MeetUpUserConnection;
 
+
+import org.json.JSONArray;
 
 import java.util.ArrayList;
 
@@ -36,7 +41,8 @@ public class UserLandingActivity extends MeetUpActivity  {
     private Button mRenameButton;
     private ListView mListView;
     private ArrayList<String> groupStrArray;
-    private ArrayAdapter<String> adapter;
+    private ArrayList<groupObjects> groupObjectArray;
+    private ArrayAdapter<groupObjects> adapter;
     private EditText mEditText;
 
 
@@ -74,8 +80,9 @@ public class UserLandingActivity extends MeetUpActivity  {
 
 
         groupStrArray = new ArrayList<String>();
-        adapter = new ArrayAdapter<String>(getApplicationContext(),
-                android.R.layout.simple_list_item_single_choice, groupStrArray);
+        groupObjectArray = new ArrayList<groupObjects>();
+        adapter = new ArrayAdapter<groupObjects>(getApplicationContext(),
+                android.R.layout.simple_list_item_single_choice, groupObjectArray);
         mListView.setAdapter(adapter);
         mListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
@@ -114,8 +121,7 @@ public class UserLandingActivity extends MeetUpActivity  {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mEditText.setText(groupStrArray.get(position));
-
+                mEditText.setText(groupObjectArray.get(position).getName());
 
             }
         });
@@ -135,6 +141,7 @@ public class UserLandingActivity extends MeetUpActivity  {
             Toast.makeText(getApplicationContext(), "Group cannot be empty!", Toast.LENGTH_LONG).show();
             mEditText.setText("");
         } else {
+            groupObjectArray.add(new groupObjects(mEditText.getText().toString().trim()));
             groupStrArray.add(mEditText.getText().toString().trim());
             mEditText.setText("");
             adapter.notifyDataSetChanged();
@@ -144,6 +151,7 @@ public class UserLandingActivity extends MeetUpActivity  {
 
     private void delete() {
         if (mListView.getCheckedItemPosition() > -1) {
+            groupObjectArray.remove(mListView.getCheckedItemPosition());
             groupStrArray.remove(mListView.getCheckedItemPosition());
             adapter.notifyDataSetChanged();
             mEditText.setText("");
@@ -163,12 +171,14 @@ public class UserLandingActivity extends MeetUpActivity  {
             Toast.makeText(getApplicationContext(), "Group Name Exists!", Toast.LENGTH_LONG).show();
         } else {
             groupStrArray.set(mListView.getCheckedItemPosition(), name);
+            groupObjectArray.get(mListView.getCheckedItemPosition()).setName(name);
             adapter.notifyDataSetChanged();
             Toast.makeText(getApplicationContext(), "Group Renamed", Toast.LENGTH_LONG).show();
             mEditText.setText("");
 
         }
     }
+
 
 }
 
