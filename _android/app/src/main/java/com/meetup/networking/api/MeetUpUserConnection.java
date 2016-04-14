@@ -6,6 +6,7 @@ import com.meetup.errorhandling.RequestFailedException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -20,6 +21,7 @@ public class MeetUpUserConnection extends MeetUpMiddlewareConnection {
     protected static final String GROUPMEMBERS = "groupmembers";
     protected static final String GROUPNAME    = "groupName";
     protected static final String GROUPDESC    = "groupDesc";
+    protected static final String GROUPID      = "groupid";
 
     /**
      * Endpoint strings.
@@ -31,6 +33,7 @@ public class MeetUpUserConnection extends MeetUpMiddlewareConnection {
     private static final String MEMBERS = "members";
     private static final String INFO    = "info";
     private static final String DEL     = "delete";
+    private static final String ID      = "id";
 
     // Should never be used.
     private MeetUpUserConnection() {
@@ -126,6 +129,27 @@ public class MeetUpUserConnection extends MeetUpMiddlewareConnection {
             return new JSONArray(getResponse());
         } catch (JSONException e) {
             return null;
+        } finally {
+            disconnect();
+        }
+    }
+
+    public int getNextGroupId() throws IOException, RequestFailedException {
+        String url = formatURLString(getUrl(), USER, GROUPS, ID);
+
+        try {
+            openConnection(url);
+            connect();
+
+            int responseCode = getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR)
+                throw new RequestFailedException(toStringInputStream(getErrorStream()));
+
+            JSONObject responseObject = new JSONObject(getResponse());
+
+            return responseObject.getInt(GROUPID);
+        } catch (JSONException e) {
+            return -1;
         } finally {
             disconnect();
         }

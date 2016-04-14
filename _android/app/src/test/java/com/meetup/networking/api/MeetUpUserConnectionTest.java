@@ -62,8 +62,8 @@ public class MeetUpUserConnectionTest {
         JSONObject memberTwo   = groupMembers.getJSONObject(1);
 
         // Assert.
-        assertEquals(memberOne.getInt(USERID), mFirstUser);
-        assertEquals(memberTwo.getInt(USERID), mSecondUser);
+        assertEquals(memberOne.getInt(USERID), mSecondUser);
+        assertEquals(memberTwo.getInt(USERID), mFirstUser);
     }
 
     @Test
@@ -113,5 +113,17 @@ public class MeetUpUserConnectionTest {
 
         // Assert.
         assertTrue(deleteOk);
+    }
+
+    @Test
+    public void meetUpUserConnection_GetNextGroupId_ReturnsThree() throws Exception {
+        // Setup.
+        MeetUpUserConnection connection = new MeetUpUserConnection(HOST_NAME, mJwt);
+
+        // Execute.
+        int nextGroupId = connection.getNextGroupId();
+
+        // Assert.
+        assertEquals(nextGroupId, mThirdGroup);
     }
 }
