@@ -104,6 +104,8 @@ exports.findUser = function (req, res, err) {
   });
 };
 
+
+
 /**
  * @param req: HTTP request.
  * @param res: HTTP response.
@@ -147,6 +149,22 @@ exports.getGroup = function (req, res, err) {
     }
   });
 };
+
+exports.getNextGroupId = function (req, res, err) {
+  var handler = ErrorHelper.getHandler();
+
+  UserDA.getNextGroupId(null, function (err, result) {
+    ErrorHelper.mergeMessages(handler, err.statusCode, err);
+    res.statusCode = handler.statusCode;
+
+    if (err.hasErrors) {
+      res.send(err);
+    } else {
+      res.send(result);
+    }
+  });
+};
+
 
 exports.deleteGroup = function (req, res, err) {
   var handler = ErrorHelper.getHandler();

@@ -221,6 +221,36 @@ exports.getGroup = function (data, send) {
   });
 };
 
+exports.getNextGroupId = function (data, send) {
+  var errorHandler = ErrorHelper.getHandler();
+
+  Postgres.connect(postgresConnectionString, function (err, client, done) {
+    if (err) {
+      ErrorHelper.mergeMessages(errorHandler, 500, err);
+      send(errorHandler, false);
+    } else {
+      var preparedStatement = "SELECT groupId " +
+                              "FROM groups_info " +
+                              "ORDER BY groupId DESC " +
+                              "LIMIT 1;";
+
+      client.query(preparedStatement, function (err, result) {
+        done();
+
+        if (err) {
+          ErrorHelper.mergeMessages(errorHandler, 500, err);
+          send(errorHandler, false);
+        } else {
+          var nextGroupId = result.rows[0].groupid + 1;
+          var data        = { groupid: nextGroupId };
+
+          send(errorHandler, data);
+        }
+      })
+    }
+  });
+};
+
 exports.deleteGroup = function (data, send) {
   var errorHandler = ErrorHelper.getHandler();
   var groupId      = data;

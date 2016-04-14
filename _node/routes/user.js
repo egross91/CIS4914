@@ -29,6 +29,9 @@ router.get('/find', UserController.findUser);
 /* GET user's groups. */
 router.get('/groups', UserController.getGroups);
 
+/* GET next possible group id. */
+router.get('/groups/id', UserController.getNextGroupId);
+
 /* GET user group information. */
 router.get('/group/:groupId', UserController.getGroup);
 
