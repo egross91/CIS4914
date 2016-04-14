@@ -13,11 +13,10 @@ import android.widget.Toast;
 
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.meetup.Objects.groupObjects;
+import com.meetup.objects.groupObjects;
 import com.meetup.R;
 import com.meetup.errorhandling.RequestFailedException;
 import com.meetup.helpers.OnDoubleTapHelper;
-import com.meetup.networking.api.MeetUpConnection;
 import com.meetup.networking.api.MeetUpUserConnection;
 
 

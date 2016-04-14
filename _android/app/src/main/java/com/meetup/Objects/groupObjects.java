@@ -1,4 +1,4 @@
-package com.meetup.Objects;
+package com.meetup.objects;
 
 import org.json.JSONException;
 import org.json.JSONObject;
