@@ -15,13 +15,17 @@ import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.meetup.Objects.groupObjects;
 import com.meetup.R;
+import com.meetup.errorhandling.RequestFailedException;
 import com.meetup.helpers.OnDoubleTapHelper;
 import com.meetup.networking.api.MeetUpConnection;
 import com.meetup.networking.api.MeetUpUserConnection;
 
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -42,9 +46,10 @@ public class UserLandingActivity extends MeetUpActivity  {
     private ListView mListView;
     private ArrayList<String> groupStrArray;
     private ArrayList<groupObjects> groupObjectArray;
+    private ArrayList<JSONObject> JSarray;
     private ArrayAdapter<groupObjects> adapter;
     private EditText mEditText;
-
+    int count = 0;
 
 
 
@@ -76,11 +81,11 @@ public class UserLandingActivity extends MeetUpActivity  {
         mEditText = (EditText) findViewById(R.id.edit_Text);
         mRenameButton = (Button) findViewById(R.id.Rename);
 
-
-
-
         groupStrArray = new ArrayList<String>();
         groupObjectArray = new ArrayList<groupObjects>();
+        JSarray = new ArrayList<JSONObject>();
+
+
         adapter = new ArrayAdapter<groupObjects>(getApplicationContext(),
                 android.R.layout.simple_list_item_single_choice, groupObjectArray);
         mListView.setAdapter(adapter);
@@ -133,7 +138,30 @@ public class UserLandingActivity extends MeetUpActivity  {
         client2 = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
-    private void add() {
+
+
+
+    public void populateUserGroupList() throws JSONException {
+        MeetUpUserConnection connection = new MeetUpUserConnection(MeetUpUserConnection.MU_API_URL, getJwt());
+        try {
+            JSONArray userGroups = connection.getGroups();
+            if (userGroups != null){
+                int len = userGroups.length();
+                for(int i = 0;i < len; i ++){
+                    groupObjectArray.add(new groupObjects(userGroups.getJSONObject(i)));
+                }
+            }
+        }catch(RequestFailedException e){
+            e.printStackTrace();
+
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+
+    }
+
+    private void add(){
+        MeetUpUserConnection connection = new MeetUpUserConnection(MeetUpUserConnection.MU_API_URL, getJwt());
         if (groupStrArray.contains(mEditText.getText().toString().trim())) {
             Toast.makeText(getApplicationContext(), "The group already exists!", Toast.LENGTH_LONG).show();
             mEditText.setText("");
@@ -142,6 +170,7 @@ public class UserLandingActivity extends MeetUpActivity  {
             mEditText.setText("");
         } else {
             groupObjectArray.add(new groupObjects(mEditText.getText().toString().trim()));
+
             groupStrArray.add(mEditText.getText().toString().trim());
             mEditText.setText("");
             adapter.notifyDataSetChanged();
