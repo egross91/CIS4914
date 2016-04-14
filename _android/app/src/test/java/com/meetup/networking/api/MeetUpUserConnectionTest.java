@@ -25,6 +25,7 @@ public class MeetUpUserConnectionTest {
     private final int mSecondUser  = 19;
     private final int mFirstGroup  = 1;
     private final int mSecondGroup = 2;
+    private final int mThirdGroup  = 3;
 
     private final String mGroupName = "other";
     private final String mGroupDesc = "group";
@@ -100,5 +101,17 @@ public class MeetUpUserConnectionTest {
 
         // Assert.
         assertTrue(updateOk);
+    }
+
+    @Test
+    public void meetUpUserConnection_DeleteGroup_ReturnsTrue() throws Exception {
+        // Setup.
+        MeetUpUserConnection connection = new MeetUpUserConnection(HOST_NAME, mJwt);
+
+        // Execute.
+        boolean deleteOk = connection.deleteGroup(mThirdGroup);
+
+        // Assert.
+        assertTrue(deleteOk);
     }
 }

@@ -9,6 +9,7 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.util.List;
 
 public class MeetUpUserConnection extends MeetUpMiddlewareConnection {
@@ -29,6 +30,7 @@ public class MeetUpUserConnection extends MeetUpMiddlewareConnection {
     private static final String GROUP   = "group";
     private static final String MEMBERS = "members";
     private static final String INFO    = "info";
+    private static final String DEL     = "delete";
 
     // Should never be used.
     private MeetUpUserConnection() {
@@ -124,6 +126,26 @@ public class MeetUpUserConnection extends MeetUpMiddlewareConnection {
             return new JSONArray(getResponse());
         } catch (JSONException e) {
             return null;
+        } finally {
+            disconnect();
+        }
+    }
+
+    public boolean deleteGroup(int groupId) throws IOException, RequestFailedException {
+        String url = formatURLString(getUrl(), USER, GROUP, DEL, Integer.toString(groupId));
+
+        try {
+            openConnection(url, POST);
+            connect();
+
+            int responseCode = getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR)
+                throw new RequestFailedException(toStringInputStream(getErrorStream()));
+            else if (responseCode == HttpURLConnection.HTTP_OK)
+                return true;
+
+
+            return Boolean.parseBoolean(getResponse());
         } finally {
             disconnect();
         }
