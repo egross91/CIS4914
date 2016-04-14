@@ -32,6 +32,9 @@ router.get('/groups', UserController.getGroups);
 /* GET user group information. */
 router.get('/group/:groupId', UserController.getGroup);
 
+/* POST delete group. */
+router.post('/group/delete/:groupId', UserController.deleteGroup);
+
 /* POST update group informatio */
 router.post('/group/info/update/:groupId', UserController.updateGroupInfo);
 

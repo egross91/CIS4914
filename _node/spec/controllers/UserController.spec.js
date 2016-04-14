@@ -151,12 +151,25 @@ describe("Unit tests for the User Controller", function () {
   });
 
   it("should update the group info successfully", function (done) {
-    requestMockObj.headers.groupName = "other";
-    requestMockObj.headers.groupDesc = "group";
+    requestMockObj.headers.groupname = "other";
+    requestMockObj.headers.groupdesc = "group";
     requestMockObj.params.groupId    = 2;
 
     setTimeout(function () {
       UserController.updateGroupInfo(requestMockObj, responseMockObj);
+
+      setTimeout(function () {
+        expect(result).toBe(true);
+        done();
+      }, 100);
+    }, 100);
+  });
+
+  it("should return true if a group was deleted successfully - deleteGroup()", function (done) {
+    requestMockObj.params.groupId = 3;
+
+    setTimeout(function () {
+      UserController.deleteGroup(requestMockObj, responseMockObj);
 
       setTimeout(function () {
         expect(result).toBe(true);

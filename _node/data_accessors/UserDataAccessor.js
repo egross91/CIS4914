@@ -221,6 +221,31 @@ exports.getGroup = function (data, send) {
   });
 };
 
+exports.deleteGroup = function (data, send) {
+  var errorHandler = ErrorHelper.getHandler();
+  var groupId      = data;
+
+  Postgres.connect(postgresConnectionString, function (err, client, done) {
+    if (err) {
+      ErrorHelper.mergeMessages(errorHandler, 500, err); // Internal Server Error.
+      send(errorHandler, false);
+    } else {
+      var preparedStatement = "DELETE FROM groups_info " +
+                              "WHERE groupid=$1::int;";
+      var inserts           = [ groupId ];
+
+      client.query(preparedStatement, inserts, function (err, result) {
+        if (err) {
+          ErrorHelper.mergeMessages(errorHandler, 500, err); // Internal Server Error.
+          send(errorHandler, false);
+        } else {
+          send(errorHandler, true);
+        }
+      });
+    }
+  });
+};
+
 exports.updateGroupInfo = function (data, send) {
   var errorHandler = ErrorHelper.getHandler();
 

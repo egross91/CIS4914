@@ -148,6 +148,22 @@ exports.getGroup = function (req, res, err) {
   });
 };
 
+exports.deleteGroup = function (req, res, err) {
+  var handler = ErrorHelper.getHandler();
+  var data    = req.params.groupId;
+
+  UserDA.deleteGroup(data, function (err, userData) {
+    ErrorHelper.mergeMessages(handler, err.statusCode, err);
+    res.statusCode = handler.statusCode;
+
+    if (err.hasErrors) {
+      res.send(handler);
+    } else {
+      res.send(userData);
+    }
+  });
+};
+
 exports.updateGroupInfo = function (req, res, err) {
   var handler    = ErrorHelper.getHandler();
   var data       = {};
