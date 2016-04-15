@@ -8,7 +8,7 @@ import com.meetup.applications.MeetUpApplication;
  * Every Activity should inherit from this Activity.
  */
 public abstract class MeetUpActivity extends AppCompatActivity {
-    protected final String getJwt() {
+    public final String getJwt() {
         MeetUpApplication app = setApplicationActivity(this);
         return app.getJwt();
     }

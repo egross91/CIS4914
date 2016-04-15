@@ -15,6 +15,11 @@ import com.meetup.activities.MeetUpActivity;
  * the MeetUp API.
  */
 public class MeetUpApplication extends Application {
+    /**
+     * Public strings.
+     */
+    public static final String GROUPID_KEY = "groupid";
+
     private static final String SP_FILE_NAME = "MeetUp.info";
 
     private String mJwt;
