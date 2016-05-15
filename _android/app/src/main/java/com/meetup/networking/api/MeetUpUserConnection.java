@@ -3,6 +3,7 @@ package com.meetup.networking.api;
 import android.text.TextUtils;
 
 import com.meetup.errorhandling.RequestFailedException;
+import com.meetup.objects.MeetUpGroup;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -194,6 +195,10 @@ public class MeetUpUserConnection extends MeetUpMiddlewareConnection {
         } finally {
             disconnect();
         }
+    }
+
+    public boolean updateGroupInfo(MeetUpGroup group) throws RequestFailedException {
+        return updateGroupInfo(Integer.parseInt(group.getId()), group.getName(), group.getDescription());
     }
 
     public boolean updateGroupInfo(int groupId, String groupName, String groupDesc) throws RequestFailedException {

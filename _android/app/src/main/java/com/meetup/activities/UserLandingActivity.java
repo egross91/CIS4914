@@ -1,6 +1,7 @@
 package com.meetup.activities;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,19 +14,18 @@ import android.widget.Toast;
 
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.meetup.objects.groupObjects;
+import com.meetup.objects.MeetUpGroup;
 import com.meetup.R;
-import com.meetup.errorhandling.RequestFailedException;
 import com.meetup.helpers.OnDoubleTapHelper;
 import com.meetup.networking.api.MeetUpUserConnection;
 
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.RunnableFuture;
 
 /**
  * Created by Kun on 2/6/16.
@@ -43,16 +43,9 @@ public class UserLandingActivity extends MeetUpActivity  {
     private Button mRemoveButton;
     private Button mRenameButton;
     private ListView mListView;
-    private ArrayList<String> groupStrArray;
-    private ArrayList<groupObjects> groupObjectArray;
-    private ArrayList<JSONObject> JSarray;
-    private ArrayAdapter<groupObjects> adapter;
+    private ArrayList<MeetUpGroup> mGroupList;
+    private ArrayAdapter<MeetUpGroup> mGroupAdapter;
     private EditText mEditText;
-    int count = 0;
-
-
-
-
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -65,10 +58,8 @@ public class UserLandingActivity extends MeetUpActivity  {
      */
     private GoogleApiClient client2;
 
-
     // TODO the ability to highlight a listview to remove
     // TODO ability for selected and pressed to carry onto friends that belong in that group
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,14 +71,11 @@ public class UserLandingActivity extends MeetUpActivity  {
         mEditText = (EditText) findViewById(R.id.edit_Text);
         mRenameButton = (Button) findViewById(R.id.Rename);
 
-        groupStrArray = new ArrayList<String>();
-        groupObjectArray = new ArrayList<groupObjects>();
-        JSarray = new ArrayList<JSONObject>();
+        mGroupList = new ArrayList<MeetUpGroup>();
 
-
-        adapter = new ArrayAdapter<groupObjects>(getApplicationContext(),
-                android.R.layout.simple_list_item_single_choice, groupObjectArray);
-        mListView.setAdapter(adapter);
+        mGroupAdapter = new ArrayAdapter<MeetUpGroup>(getApplicationContext(),
+                android.R.layout.simple_list_item_single_choice, mGroupList);
+        mListView.setAdapter(mGroupAdapter);
         mListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
         mAddButton.setOnClickListener(new View.OnClickListener() {
@@ -110,104 +98,217 @@ public class UserLandingActivity extends MeetUpActivity  {
             }
 
         });
+
         mListView.setOnTouchListener(new OnDoubleTapHelper(this){
-
-
             public void onDoubleTap(MotionEvent e){
                 Toast.makeText(getApplicationContext(), "DoubleTap", Toast.LENGTH_LONG).show();
                 Intent groupListActivity = new Intent(UserLandingActivity.this, GroupListActivity.class);
                 startActivity(groupListActivity);
            }
-
         });
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mEditText.setText(groupObjectArray.get(position).getName());
-
+                mEditText.setText(mGroupList.get(position).getName());
             }
         });
-
-
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client2 = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
 
-
-
-    public void populateUserGroupList() throws JSONException {
-        MeetUpUserConnection connection = new MeetUpUserConnection(MeetUpUserConnection.MU_API_URL, getJwt());
-        try {
-            JSONArray userGroups = connection.getGroups();
-            if (userGroups != null){
-                int len = userGroups.length();
-                for(int i = 0;i < len; i ++){
-                    groupObjectArray.add(new groupObjects(userGroups.getJSONObject(i)));
-                }
-            }
-        }catch(RequestFailedException e){
-            e.printStackTrace();
-
-        }catch(IOException e){
-            e.printStackTrace();
-        }
-
+        new PopulateUserGroupsTask().execute();
     }
 
-    private void add(){
-        MeetUpUserConnection connection = new MeetUpUserConnection(MeetUpUserConnection.MU_API_URL, getJwt());
-        if (groupStrArray.contains(mEditText.getText().toString().trim())) {
-            Toast.makeText(getApplicationContext(), "The group already exists!", Toast.LENGTH_LONG).show();
-            mEditText.setText("");
-        } else if (mEditText.getText().toString().trim().length() == 0) {
-            Toast.makeText(getApplicationContext(), "Group cannot be empty!", Toast.LENGTH_LONG).show();
-            mEditText.setText("");
-        } else {
-            groupObjectArray.add(new groupObjects(mEditText.getText().toString().trim()));
+    private void add() {
+        String groupName = mEditText.getText().toString().trim();
 
-            groupStrArray.add(mEditText.getText().toString().trim());
-            mEditText.setText("");
-            adapter.notifyDataSetChanged();
+        if (groupNameExists(groupName)) {
+            Toast.makeText(getApplicationContext(), "The group already exists!", Toast.LENGTH_LONG).show();
+        } else if (groupName.length() == 0) {
+            Toast.makeText(getApplicationContext(), "Group cannot be empty!", Toast.LENGTH_LONG).show();
+        } else {
+            new AddGroupAsyncTask().execute(groupName);
         }
 
+        mEditText.setText("");
     }
 
     private void delete() {
         if (mListView.getCheckedItemPosition() > -1) {
-            groupObjectArray.remove(mListView.getCheckedItemPosition());
-            groupStrArray.remove(mListView.getCheckedItemPosition());
-            adapter.notifyDataSetChanged();
-            mEditText.setText("");
+            mGroupList.remove(mListView.getCheckedItemPosition());
+            mGroupAdapter.notifyDataSetChanged();
             Toast.makeText(getApplicationContext(), "Group Deleted", Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(getApplicationContext(), "Nothing to Delete", Toast.LENGTH_LONG).show();
         }
+
         mEditText.setText("");
     }
 
     private void update() {
+        String groupName = mEditText.getText().toString().trim();
 
-        String name = mEditText.getText().toString().trim();
-        if (name.isEmpty()) {
+        if (groupName.isEmpty()) {
             Toast.makeText(getApplicationContext(), "Nothing to Rename", Toast.LENGTH_LONG).show();
-        } else if (groupStrArray.contains(name)) {
+        } else if (groupNameExists(groupName)) {
             Toast.makeText(getApplicationContext(), "Group Name Exists!", Toast.LENGTH_LONG).show();
         } else {
-            groupStrArray.set(mListView.getCheckedItemPosition(), name);
-            groupObjectArray.get(mListView.getCheckedItemPosition()).setName(name);
-            adapter.notifyDataSetChanged();
-            Toast.makeText(getApplicationContext(), "Group Renamed", Toast.LENGTH_LONG).show();
-            mEditText.setText("");
+            MeetUpGroup group = mGroupList.get(mListView.getCheckedItemPosition());
 
+            UpdateGroupInfoTask updateGroupTask = new UpdateGroupInfoTask();
+            updateGroupTask.setGroupId(group.getId());
+            updateGroupTask.setGroupName(groupName);
+            updateGroupTask.setGroupDesc(group.getDescription());
+
+            updateGroupTask.execute(group);
+        }
+
+        mEditText.setText("");
+    }
+
+    private boolean groupNameExists(final String groupName) {
+        for (MeetUpGroup group : mGroupList) {
+            if (groupName.equals(group.getName()))
+                return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * TASKS
+     */
+    private class PopulateUserGroupsTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            MeetUpUserConnection connection = new MeetUpUserConnection(MeetUpUserConnection.MU_API_URL, getJwt());
+
+            try {
+                JSONArray userGroups = connection.getGroups();
+
+                if (userGroups != null){
+                    for(int i = 0; i < userGroups.length(); i++){
+                        mGroupList.add(new MeetUpGroup(userGroups.getJSONObject(i)));
+                    }
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mGroupAdapter.notifyDataSetChanged();
+                    }
+                });
+            } catch(Exception e){
+                e.printStackTrace();
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), getString(R.string.failed_to_fetch_groups), Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+
+            return null;
         }
     }
 
+    private class AddGroupAsyncTask extends AsyncTask<String, Void, Void> {
+        @Override
+        protected Void doInBackground(String... params) {
+            String groupName = params[0];
 
+            MeetUpUserConnection groupIdConnection  = new MeetUpUserConnection(MeetUpUserConnection.MU_API_URL, getJwt());
+            MeetUpUserConnection addGroupConnection = new MeetUpUserConnection(MeetUpUserConnection.MU_API_URL, getJwt());
+
+            try {
+                int groupId = groupIdConnection.getNextGroupId();
+                final MeetUpGroup newGroup = new MeetUpGroup(groupName, Integer.toString(groupId), "");
+
+                addGroupConnection.updateGroupInfo(newGroup);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mGroupList.add(newGroup);
+                        mGroupAdapter.notifyDataSetChanged();
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), getString(R.string.failed_to_add_group), Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+
+            return null;
+        }
+    }
+
+    private class UpdateGroupInfoTask extends AsyncTask<MeetUpGroup, Void, Void> {
+        private String grpId;
+        private String grpName;
+        private String grpDesc;
+
+        @Override
+        protected Void doInBackground(MeetUpGroup[] params) {
+            MeetUpUserConnection updateNameConnection = new MeetUpUserConnection(MeetUpUserConnection.MU_API_URL, getJwt());
+
+            try {
+                MeetUpGroup group = params[0];
+                updateNameConnection.updateGroupInfo(Integer.parseInt(getGroupId()), getGroupName(), getGroupDesc());
+                updateGroup(group);
+
+                mGroupAdapter.notifyDataSetChanged();
+                Toast.makeText(getApplicationContext(), getString(R.string.group_renamed_successfully), Toast.LENGTH_LONG).show();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(getApplicationContext(), getString(R.string.failed_to_update_group_info), Toast.LENGTH_LONG).show();
+            }
+
+            return null;
+        }
+
+        private void updateGroup(MeetUpGroup group) {
+            group.setName(getGroupName());
+            group.setDescription(getGroupDesc());
+        }
+
+        public String getGroupId() {
+            return grpId;
+        }
+
+        public void setGroupId(String grpId) {
+            this.grpId = grpId;
+        }
+
+        public String getGroupName() {
+            return grpName;
+        }
+
+        public void setGroupName(String grpName) {
+            this.grpName = grpName;
+        }
+
+        public String getGroupDesc() {
+            return grpDesc;
+        }
+
+        public void setGroupDesc(String grpDesc) {
+            this.grpDesc = grpDesc;
+        }
+    }
 }
 
 

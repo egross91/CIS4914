@@ -30,12 +30,12 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.meetup.R;
 import com.meetup.applications.MeetUpApplication;
 import com.meetup.errorhandling.RequestFailedException;
 import com.meetup.errorhandling.UserNotFoundException;
-import com.meetup.helpers.ToastHelper;
 import com.meetup.networking.api.MeetUpAuthConnection;
 
 import java.net.HttpURLConnection;
@@ -386,8 +386,7 @@ public class LoginLandingActivity extends MeetUpActivity implements LoaderCallba
                 return HttpURLConnection.HTTP_BAD_REQUEST;
             } catch (RequestFailedException e) {
                 // Something on the backend went wrong.
-                ToastHelper errorToast = new ToastHelper(getActivity());
-                errorToast.display(getString(R.string.request_failed));
+                Toast.makeText(getApplicationContext(), getString(R.string.request_failed), Toast.LENGTH_LONG).show();
 
                 return HttpURLConnection.HTTP_INTERNAL_ERROR;
             } catch (Exception e) {
@@ -409,8 +408,6 @@ public class LoginLandingActivity extends MeetUpActivity implements LoaderCallba
             mAuthTask = null;
             showProgress(false);
 
-            ToastHelper resultToast = new ToastHelper(getActivity());
-
             // As the user if they would like to register, because the email was not found.
             if (statusCode == HttpURLConnection.HTTP_BAD_REQUEST) {
                 runOnUiThread(new Runnable() {
@@ -427,7 +424,7 @@ public class LoginLandingActivity extends MeetUpActivity implements LoaderCallba
                     }
                 });
             } else if (statusCode == HttpURLConnection.HTTP_OK) {
-                resultToast.display(getString(R.string.welcome_to_meetup));
+                Toast.makeText(getApplicationContext(), getString(R.string.welcome_to_meetup), Toast.LENGTH_LONG).show();
                 // TODO: Take user to UserLandingActivity.
                 Intent userLandingActivity = new Intent(LoginLandingActivity.this, UserLandingActivity.class);
                 startActivity(userLandingActivity);
@@ -435,7 +432,7 @@ public class LoginLandingActivity extends MeetUpActivity implements LoaderCallba
 //                groupActivityIntent.putExtra(MeetUpApplication.GROUPID_KEY, 1);
 //                startActivity(groupActivityIntent);
             } else {
-                resultToast.display(String.format(getString(R.string.login_failed), getEmail()));
+                Toast.makeText(getApplicationContext(), String.format(getString(R.string.login_failed), getEmail()), Toast.LENGTH_LONG).show();
             }
         }
 
@@ -501,10 +498,8 @@ public class LoginLandingActivity extends MeetUpActivity implements LoaderCallba
 
         @Override
         public void onPostExecute(final Integer statusCode) {
-            ToastHelper resultToast = new ToastHelper(getActivity());
-
             if (statusCode == HttpURLConnection.HTTP_OK) {
-                resultToast.display(String.format(getString(R.string.registration_successful), getEmail()));
+                Toast.makeText(getApplicationContext(), String.format(getString(R.string.registration_successful), getEmail()), Toast.LENGTH_LONG).show();
                 // TODO: Take user to UserLandingActivity.
                 Intent userLandingActivity = new Intent(LoginLandingActivity.this, UserLandingActivity.class);
                 startActivity(userLandingActivity);
@@ -513,7 +508,7 @@ public class LoginLandingActivity extends MeetUpActivity implements LoaderCallba
 //                startActivity(groupActivityIntent);
             }
             else {
-                resultToast.display(String.format(getString(R.string.registration_failed), getEmail()));
+                Toast.makeText(getApplicationContext(), String.format(getString(R.string.registration_failed), getEmail()), Toast.LENGTH_LONG).show();
             }
         }
     }
