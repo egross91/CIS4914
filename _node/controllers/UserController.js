@@ -12,6 +12,23 @@ var JWT         = require('jsonwebtoken');
  */
 var jwtSecret = process.env.MU_JWT_SECRET;
 
+exports.getCurrentUser = function (req, res, err) {
+  var handler = ErrorHelper.getHandler();
+  var data    = JWT.decode(req.headers.jwt, jwtSecret);
+  delete data.iat; delete data.exp;
+
+  UserDA.getCurrentUser(data, function (err, userData) {
+    ErrorHelper.mergeMessages(handler, err.statusCode, err);
+    res.statusCode = handler.statusCode;
+
+    if (err.hasErrors) {
+      res.send(handler);
+    } else {
+      res.send(userData);
+    }
+  });
+};
+
 /**
  * @param req: HTTP request.
  * @param res: HTTP response.
@@ -95,127 +112,6 @@ exports.findUser = function (req, res, err) {
   UserDA.findUser(data, function (err, userData) {
     ErrorHelper.mergeMessages(handler, err.statusCode, err);
     req.statusCode = handler.statusCode;
-
-    if (err.hasErrors) {
-      res.send(handler);
-    } else {
-      res.send(userData);
-    }
-  });
-};
-
-
-
-/**
- * @param req: HTTP request.
- * @param res: HTTP response.
- * @param err: HTTP err.
- * @summary: Retrieves the specified user's groups' information from the DB.
- **/
-exports.getGroups = function (req, res, err) {
-  var handler = ErrorHelper.getHandler();
-  var data    = JWT.decode(req.headers.jwt, jwtSecret);
-
-  UserDA.getGroups(data, function (err, userData) {
-    ErrorHelper.mergeMessages(handler, err.statusCode, err);
-    res.statusCode = handler.statusCode;
-
-    if (err.hasErrors) {
-      res.send(handler);
-    } else {
-      res.send(userData);
-    }
-  });
-};
-
-/**
- * @param req: HTTP request.
- * @param res: HTTP response.
- * @param err: HTTP err.
- * @summary: Retrieves the group's information (members, locations, etc.) from the DB.
- **/
-exports.getGroup = function (req, res, err) {
-  var handler = ErrorHelper.getHandler();
-  var data    = req.params.groupId;
-
-  UserDA.getGroup(data, function (err, userData) {
-    ErrorHelper.mergeMessages(handler, err.statusCode, err);
-    res.statusCode = handler.statusCode;
-
-    if (err.hasErrors) {
-      res.send(handler);
-    } else {
-      res.send(userData);
-    }
-  });
-};
-
-exports.getNextGroupId = function (req, res, err) {
-  var handler = ErrorHelper.getHandler();
-
-  UserDA.getNextGroupId(null, function (err, result) {
-    ErrorHelper.mergeMessages(handler, err.statusCode, err);
-    res.statusCode = handler.statusCode;
-
-    if (err.hasErrors) {
-      res.send(err);
-    } else {
-      res.send(result);
-    }
-  });
-};
-
-
-exports.deleteGroup = function (req, res, err) {
-  var handler = ErrorHelper.getHandler();
-  var data    = req.params.groupId;
-
-  UserDA.deleteGroup(data, function (err, userData) {
-    ErrorHelper.mergeMessages(handler, err.statusCode, err);
-    res.statusCode = handler.statusCode;
-
-    if (err.hasErrors) {
-      res.send(handler);
-    } else {
-      res.send(userData);
-    }
-  });
-};
-
-exports.updateGroupInfo = function (req, res, err) {
-  var handler    = ErrorHelper.getHandler();
-  var data       = {};
-  data.groupName = req.headers.groupname;
-  data.groupDesc = req.headers.groupdesc;
-  data.groupId   = req.params.groupId;
-
-  UserDA.updateGroupInfo(data, function (err, userData) {
-    ErrorHelper.mergeMessages(handler, err.statusCode, err);
-    res.statusCode = handler.statusCode;
-
-    if (err.hasErrors) {
-      res.send(handler);
-    } else {
-      res.send(userData);
-    }
-  });
-};
-
-/**
- * @param req: HTTP request.
- * @param res: HTTP response.
- * @param err: HTTP err.
- * @summary: Update the specified user's group information in the DB.
- **/
-exports.updateGroupMembers = function (req, res, err) {
-  var handler       = ErrorHelper.getHandler();
-  var data          = {};
-  data.groupMembers = req.headers.groupmembers;
-  data.groupId      = req.params.groupId;
-
-  UserDA.updateGroupMembers(data, function (err, userData) {
-    ErrorHelper.mergeMessages(handler, err.statusCode, err);
-    res.statusCode = handler.statusCode;
 
     if (err.hasErrors) {
       res.send(handler);

@@ -9,9 +9,10 @@ var compression = require('compression');
 /** 
  * Routes
  **/
-var auth = require('./routes/auth');
-var loc  = require('./routes/location');
-var user = require('./routes/user');
+var auth   = require('./routes/auth');
+var loc    = require('./routes/location');
+var user   = require('./routes/user');
+var groups = require('./routes/groups');
 
 var app = express();
 
@@ -34,6 +35,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/auth', auth);
 app.use('/location', loc);
 app.use('/user', user);
+app.use('/group', groups);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
