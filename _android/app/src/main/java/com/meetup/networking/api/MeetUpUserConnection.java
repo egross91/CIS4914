@@ -19,22 +19,13 @@ public class MeetUpUserConnection extends MeetUpMiddlewareConnection {
      * Property strings.
      */
     protected static final String FRIENDIDS    = "friendids";
-    protected static final String GROUPMEMBERS = "groupmembers";
-    protected static final String GROUPNAME    = "groupName";
-    protected static final String GROUPDESC    = "groupDesc";
-    protected static final String GROUPID      = "groupid";
 
     /**
      * Endpoint strings.
      */
+    private static final String ME      = "me";
     private static final String USER    = "user";
     private static final String FRIENDS = "friends";
-    private static final String GROUPS  = "groups";
-    private static final String GROUP   = "group";
-    private static final String MEMBERS = "members";
-    private static final String INFO    = "info";
-    private static final String DEL     = "delete";
-    private static final String ID      = "id";
 
     // Should never be used.
     private MeetUpUserConnection() {
@@ -50,21 +41,20 @@ public class MeetUpUserConnection extends MeetUpMiddlewareConnection {
         super(url, jwt);
     }
 
-    public JSONArray getGroups() throws RequestFailedException, IOException {
-        String url = formatURLString(getUrl(), USER, GROUPS);
+    public JSONObject getCurrentUser() throws IOException, RequestFailedException {
+        String url = formatURLString(getUrl(), USER , ME);
 
         try {
             openConnection(url);
             connect();
 
-            int statusCode = getResponseCode();
-            if (statusCode == HttpURLConnection.HTTP_INTERNAL_ERROR)
+            int responseCode = getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR)
                 throw new RequestFailedException(toStringInputStream(getErrorStream()));
-            else if (statusCode == HttpURLConnection.HTTP_NO_CONTENT)
-                return null;
 
-            return new JSONArray(getResponse());
+            return new JSONObject(getResponse());
         } catch (JSONException e) {
+            e.printStackTrace();
             return null;
         } finally {
             disconnect();
@@ -112,129 +102,5 @@ public class MeetUpUserConnection extends MeetUpMiddlewareConnection {
         } finally {
             disconnect();
         }
-    }
-
-    public JSONArray getGroup(int groupId) throws IOException, RequestFailedException {
-        String url = formatURLString(getUrl(), USER, GROUP, Integer.toString(groupId));
-
-        try {
-            openConnection(url);
-            connect();
-
-            int responseCode = getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR)
-                throw new RequestFailedException(toStringInputStream(getErrorStream()));
-            else if (responseCode == HttpURLConnection.HTTP_NO_CONTENT)
-                return null;
-
-            return new JSONArray(getResponse());
-        } catch (JSONException e) {
-            return null;
-        } finally {
-            disconnect();
-        }
-    }
-
-    public int getNextGroupId() throws IOException, RequestFailedException {
-        String url = formatURLString(getUrl(), USER, GROUPS, ID);
-
-        try {
-            openConnection(url);
-            connect();
-
-            int responseCode = getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR)
-                throw new RequestFailedException(toStringInputStream(getErrorStream()));
-
-            JSONObject responseObject = new JSONObject(getResponse());
-
-            return responseObject.getInt(GROUPID);
-        } catch (JSONException e) {
-            return -1;
-        } finally {
-            disconnect();
-        }
-    }
-
-    public boolean deleteGroup(int groupId) throws IOException, RequestFailedException {
-        String url = formatURLString(getUrl(), USER, GROUP, DEL, Integer.toString(groupId));
-
-        try {
-            openConnection(url, POST);
-            connect();
-
-            int responseCode = getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR)
-                throw new RequestFailedException(toStringInputStream(getErrorStream()));
-            else if (responseCode == HttpURLConnection.HTTP_OK)
-                return true;
-
-
-            return Boolean.parseBoolean(getResponse());
-        } finally {
-            disconnect();
-        }
-    }
-
-    public boolean updateGroupMembers(int groupId, List<Integer> idsOfGroupMembers) throws RequestFailedException {
-        String url = formatURLString(getUrl(), USER, MEMBERS, GROUP, UPDATE, Integer.toString(groupId));
-
-        try {
-            openConnection(url, POST);
-            setRequestProperty(GROUPMEMBERS, formatArray(',', idsOfGroupMembers.toArray()));
-            connect();
-
-            int responseCode = getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR)
-                throw new RequestFailedException("Failed to update group members.");
-
-            return (!TextUtils.isEmpty(getResponse()));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        } finally {
-            disconnect();
-        }
-    }
-
-    public boolean updateGroupInfo(MeetUpGroup group) throws RequestFailedException {
-        return updateGroupInfo(Integer.parseInt(group.getId()), group.getName(), group.getDescription());
-    }
-
-    public boolean updateGroupInfo(int groupId, String groupName, String groupDesc) throws RequestFailedException {
-        String url = formatURLString(getUrl(), USER, GROUP, INFO, UPDATE, Integer.toString(groupId));
-
-        try {
-            openConnection(url, POST);
-            setRequestProperty(GROUPNAME, groupName);
-            setRequestProperty(GROUPDESC, groupDesc);
-            connect();
-
-            int responseCode = getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR)
-                throw new RequestFailedException("Failed to update group info.");
-
-            return (!TextUtils.isEmpty(getResponse()));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        } finally {
-            disconnect();
-        }
-    }
-
-    private String formatArray(char delimiter, Object... args) {
-        StringBuilder builder = new StringBuilder();
-
-        if (args.length > 0) {
-            builder.append(args[0]);
-
-            for (int i = 1; i < args.length; ++i) {
-                builder.append(delimiter);
-                builder.append(args[i]);
-            }
-        }
-
-        return builder.toString();
     }
 }

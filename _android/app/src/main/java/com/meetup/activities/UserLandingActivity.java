@@ -14,22 +14,20 @@ import android.widget.Toast;
 
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.meetup.networking.api.MeetUpConnection;
+import com.meetup.networking.api.MeetUpGroupConnection;
 import com.meetup.objects.MeetUpGroup;
 import com.meetup.R;
 import com.meetup.helpers.OnDoubleTapHelper;
 import com.meetup.networking.api.MeetUpUserConnection;
-
+import com.meetup.objects.MeetUpUser;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.RunnableFuture;
 
-/**
- * Created by Kun on 2/6/16.
- */
 
 /**
  * After registering User is brought to list of group page
@@ -183,13 +181,22 @@ public class UserLandingActivity extends MeetUpActivity  {
         return false;
     }
 
+    private List<Integer> convertMembersToListOfInts(Collection<MeetUpUser> members) {
+        List<Integer> ids = new ArrayList<Integer>();
+
+        for (MeetUpUser member : members)
+            ids.add(member.getUserId());
+
+        return ids;
+    }
+
     /**
      * TASKS
      */
     private class PopulateUserGroupsTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
-            MeetUpUserConnection connection = new MeetUpUserConnection(MeetUpUserConnection.MU_API_URL, getJwt());
+            MeetUpGroupConnection connection = new MeetUpGroupConnection(MeetUpUserConnection.MU_API_URL, getJwt());
 
             try {
                 JSONArray userGroups = connection.getGroups();
@@ -226,14 +233,19 @@ public class UserLandingActivity extends MeetUpActivity  {
         protected Void doInBackground(String... params) {
             String groupName = params[0];
 
-            MeetUpUserConnection groupIdConnection  = new MeetUpUserConnection(MeetUpUserConnection.MU_API_URL, getJwt());
-            MeetUpUserConnection addGroupConnection = new MeetUpUserConnection(MeetUpUserConnection.MU_API_URL, getJwt());
+            MeetUpGroupConnection groupIdConnection  = new MeetUpGroupConnection(MeetUpUserConnection.MU_API_URL, getJwt());
+            MeetUpGroupConnection addGroupConnection = new MeetUpGroupConnection(MeetUpUserConnection.MU_API_URL, getJwt());
+            MeetUpGroupConnection grpMembsConnection = new MeetUpGroupConnection(MeetUpConnection.MU_API_URL, getJwt());
+            MeetUpUserConnection userInfoConnection  = new MeetUpUserConnection(MeetUpConnection.MU_API_URL, getJwt());
 
             try {
                 int groupId = groupIdConnection.getNextGroupId();
+                MeetUpUser me = new MeetUpUser(userInfoConnection.getCurrentUser());
                 final MeetUpGroup newGroup = new MeetUpGroup(groupName, Integer.toString(groupId), "");
 
+                newGroup.addGroupMember(me);
                 addGroupConnection.updateGroupInfo(newGroup);
+                grpMembsConnection.updateGroupMembers(Integer.parseInt(newGroup.getId()), convertMembersToListOfInts(newGroup.getGroupMembers()));
 
                 runOnUiThread(new Runnable() {
                     @Override
@@ -263,7 +275,7 @@ public class UserLandingActivity extends MeetUpActivity  {
 
         @Override
         protected Void doInBackground(MeetUpGroup[] params) {
-            MeetUpUserConnection updateNameConnection = new MeetUpUserConnection(MeetUpUserConnection.MU_API_URL, getJwt());
+            MeetUpGroupConnection updateNameConnection = new MeetUpGroupConnection(MeetUpUserConnection.MU_API_URL, getJwt());
 
             try {
                 MeetUpGroup group = params[0];

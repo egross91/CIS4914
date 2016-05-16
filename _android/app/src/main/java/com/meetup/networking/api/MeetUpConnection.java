@@ -152,4 +152,19 @@ public abstract class MeetUpConnection {
     private void setResponse(String res) {
         mResponse = res;
     }
+
+    protected String formatArray(char delimiter, Object... args) {
+        StringBuilder builder = new StringBuilder();
+
+        if (args.length > 0) {
+            builder.append(args[0]);
+
+            for (int i = 1; i < args.length; ++i) {
+                builder.append(delimiter);
+                builder.append(args[i]);
+            }
+        }
+
+        return builder.toString();
+    }
 }

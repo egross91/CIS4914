@@ -13,7 +13,7 @@ import com.meetup.R;
 import com.meetup.activities.GroupActivity;
 import com.meetup.adapter.MeetUpUserAdapter;
 import com.meetup.interfaces.Populatable;
-import com.meetup.networking.api.MeetUpUserConnection;
+import com.meetup.networking.api.MeetUpGroupConnection;
 import com.meetup.objects.MeetUpUser;
 
 import org.json.JSONArray;
@@ -63,7 +63,7 @@ public class GroupMemberListFragment extends ListFragment implements Populatable
         @Override
         protected Void doInBackground(Integer... params) {
             int groupId                     = params[0];
-            MeetUpUserConnection connection = new MeetUpUserConnection(getJwt());
+            MeetUpGroupConnection connection = new MeetUpGroupConnection(getJwt());
             JSONArray groupMembersFromDb    = null;
 
             try {

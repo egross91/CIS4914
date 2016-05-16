@@ -3,21 +3,22 @@ package com.meetup.objects;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 public class MeetUpGroup {
     private String id;
     private String name;
     private String description;
+    private List<MeetUpUser> groupMembers = new ArrayList<MeetUpUser>();
 
     public static final String GROUP_ID = "groupid";
     public static final String GROUP_NAME = "groupname";
     public static final String GROUP_DESCRIPTION = "groupdescription";
 
-    public MeetUpGroup(){
-        super();
-    }
-
     public MeetUpGroup(String name, String id, String desc){
-        super();
         this.name        = name;
         this.id          = id;
         this.description = desc;
@@ -52,5 +53,33 @@ public class MeetUpGroup {
     @Override
     public String toString() {
         return this.name;
+    }
+
+    public Collection<MeetUpUser> getGroupMembers() {
+        return Collections.unmodifiableCollection(groupMembers);
+    }
+
+    public boolean addGroupMember(MeetUpUser member) {
+        return this.groupMembers.add(member);
+    }
+
+    public boolean addGroupMembers(List<MeetUpUser> members) {
+        for (MeetUpUser member : members) {
+            addGroupMember(member);
+        }
+
+        return true;
+    }
+
+    public boolean removeGroupMember(MeetUpUser member) {
+        return this.groupMembers.remove(member);
+    }
+
+    public boolean removeGroupMembers(List<MeetUpUser> members) {
+        for (MeetUpUser member : members) {
+            removeGroupMember(member);
+        }
+
+        return true;
     }
 }
