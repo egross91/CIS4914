@@ -316,11 +316,21 @@ public class UserLandingActivity extends MeetUpActivity  {
                 updateNameConnection.updateGroupInfo(Integer.parseInt(getGroupId()), getGroupName(), getGroupDesc());
                 updateGroup(group);
 
-                mGroupAdapter.notifyDataSetChanged();
-                Toast.makeText(getApplicationContext(), getString(R.string.group_renamed_successfully), Toast.LENGTH_LONG).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mGroupAdapter.notifyDataSetChanged();
+                        Toast.makeText(getApplicationContext(), getString(R.string.group_renamed_successfully), Toast.LENGTH_LONG).show();
+                    }
+                });
             } catch (Exception e) {
                 e.printStackTrace();
-                Toast.makeText(getApplicationContext(), getString(R.string.failed_to_update_group_info), Toast.LENGTH_LONG).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), getString(R.string.failed_to_update_group_info), Toast.LENGTH_LONG).show();
+                    }
+                });
             }
 
             return null;
