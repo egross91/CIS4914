@@ -54,7 +54,7 @@ exports.getGroups = function (data, send) {
  * @param send: Callback - to be called on error or success.
  * @summary: Retrieves the group's information (members, locations, etc.) from the DB.
  **/
-exports.getGroup = function (data, send) {
+exports.getGroupMembers = function (data, send) {
   var groupId      = data;
   var errorHandler = ErrorHelper.getHandler();
 
@@ -131,11 +131,43 @@ exports.deleteGroup = function (data, send) {
       var inserts           = [ groupId ];
 
       client.query(preparedStatement, inserts, function (err, result) {
+        done();
+
         if (err) {
           ErrorHelper.mergeMessages(errorHandler, 500, err); // Internal Server Error.
           send(errorHandler, false);
         } else {
           send(errorHandler, true);
+        }
+      });
+    }
+  });
+};
+
+exports.getGroupInfo = function (data, send) {
+  var errorHandler = ErrorHelper.getHandler();
+
+  Postgres.connect(postgresConnectionString, function (err, client, done) {
+    if (err) {
+      ErrorHelper.mergeMessages(errorHandler, 500, err);
+      send(errorHandler, false);
+    } else {
+      var preparedStatement = "SELECT * " +
+                              "FROM groups_info " +
+                              "WHERE groupId=$1::bigint;";
+      var inserts           = [ data.groupId ];
+
+      client.query(preparedStatement, inserts, function (err, result) {
+        done();
+
+        if (err) {
+          ErrorHelper.mergeMessages(errorHandler, 500, err);
+          send(errorHandler, false);
+        } else if (result.rows.length < 1) {
+          ErrorHelper.addMessages(errorHandler, 204, "No content for group " + data.groupId + ".");
+          send(errorHandler, false);
+        } else {
+          send(errorHandler, result.rows[0]);
         }
       });
     }
@@ -155,6 +187,8 @@ exports.updateGroupInfo = function (data, send) {
       var inserts           = [ data.groupId, data.groupName, data.groupDesc ];
 
       client.query(preparedStatement, inserts, function (err, result) {
+        done();
+
         if (err) {
           ErrorHelper.mergeMessages(errorHandler, 500, err); // Internal Server Error.
           send(errorHandler, false);

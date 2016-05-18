@@ -38,9 +38,9 @@ describe("Unit Tests for Group Controller", function () {
     }
   };
 
-  it("should return the group information when sending the 'groupid' - getGroup().", function (done) {
+  it("should return the group information when sending the 'groupid' - getGroupMembers().", function (done) {
     setTimeout(function () {
-      GroupController.getGroup(requestMockObj, responseMockObj);
+      GroupController.getGroupMembers(requestMockObj, responseMockObj);
 
       setTimeout(function () {
         expect(result).toContain(jasmine.objectContaining({
@@ -55,11 +55,11 @@ describe("Unit Tests for Group Controller", function () {
     }, 100);
   });
 
-  it("should return 204 error if no one is found - getGroup().", function (done) {
+  it("should return 204 error if no one is found - getGroupInfo().", function (done) {
     requestMockObj.params.groupId = -1; // Should never exist.
 
     setTimeout(function () {
-      GroupController.getGroup(requestMockObj, responseMockObj);
+      GroupController.getGroupInfo(requestMockObj, responseMockObj);
 
       setTimeout(function () {
         expect(result.statusCode).toBe(204); // No Content.
@@ -72,7 +72,7 @@ describe("Unit Tests for Group Controller", function () {
     requestMockObj.params.groupId = "fail";
 
     setTimeout(function () {
-      GroupController.getGroup(requestMockObj, responseMockObj);
+      GroupController.getGroupInfo(requestMockObj, responseMockObj);
 
       setTimeout(function () {
         expect(result.statusCode).toBe(500); // Internal Server Error.

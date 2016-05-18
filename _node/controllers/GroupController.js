@@ -38,13 +38,13 @@ exports.getGroups = function (req, res, err) {
  * @param req: HTTP request.
  * @param res: HTTP response.
  * @param err: HTTP err.
- * @summary: Retrieves the group's information (members, locations, etc.) from the DB.
+ * @summary: Retrieves the group's members from the DB.
  **/
-exports.getGroup = function (req, res, err) {
+exports.getGroupMembers = function (req, res, err) {
   var handler = ErrorHelper.getHandler();
   var data    = req.params.groupId;
 
-  GroupDA.getGroup(data, function (err, userData) {
+  GroupDA.getGroupMembers(data, function (err, userData) {
     ErrorHelper.mergeMessages(handler, err.statusCode, err);
     res.statusCode = handler.statusCode;
 
@@ -85,6 +85,23 @@ exports.deleteGroup = function (req, res, err) {
       res.send(userData);
     }
   });
+};
+
+exports.getGroupInfo = function (req, res, err) {
+  var handler  = ErrorHelper.getHandler();
+  var data     = {};
+  data.groupId = req.params.groupId;
+
+  GroupDA.getGroupInfo(data, function (err, userData) {
+    ErrorHelper.mergeMessages(handler, err.statusCode, err);
+    res.statusCode = handler.statusCode;
+
+    if (err.hasErrors) {
+      res.send(handler);
+    } else {
+      res.send(userData);
+    }
+  })
 };
 
 exports.updateGroupInfo = function (req, res, err) {
