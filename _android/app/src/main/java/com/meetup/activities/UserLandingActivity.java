@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.meetup.applications.MeetUpApplication;
 import com.meetup.networking.api.MeetUpConnection;
 import com.meetup.networking.api.MeetUpGroupConnection;
 import com.meetup.objects.MeetUpGroup;
@@ -99,9 +100,15 @@ public class UserLandingActivity extends MeetUpActivity  {
 
         mListView.setOnTouchListener(new OnDoubleTapHelper(this){
             public void onDoubleTap(MotionEvent e){
-                Toast.makeText(getApplicationContext(), "DoubleTap", Toast.LENGTH_LONG).show();
-                Intent groupListActivity = new Intent(UserLandingActivity.this, GroupListActivity.class);
-                startActivity(groupListActivity);
+                int groupIndex = mListView.getCheckedItemPosition();
+
+                if (groupIndex > -1) {
+                    MeetUpGroup selectedGroup = mGroupList.get(groupIndex);
+                    Intent groupActivityIntent = new Intent(UserLandingActivity.this, GroupActivity.class);
+
+                    groupActivityIntent.putExtra(MeetUpApplication.GROUPID_KEY, selectedGroup.getId());
+                    startActivity(groupActivityIntent);
+                }
            }
         });
 
@@ -314,7 +321,7 @@ public class UserLandingActivity extends MeetUpActivity  {
             try {
                 MeetUpGroup group = params[0];
                 updateNameConnection.updateGroupInfo(Integer.parseInt(getGroupId()), getGroupName(), getGroupDesc());
-                updateGroup(group);
+                updateLocalGroupObj(group);
 
                 runOnUiThread(new Runnable() {
                     @Override
@@ -336,7 +343,7 @@ public class UserLandingActivity extends MeetUpActivity  {
             return null;
         }
 
-        private void updateGroup(MeetUpGroup group) {
+        private void updateLocalGroupObj(MeetUpGroup group) {
             group.setName(getGroupName());
             group.setDescription(getGroupDesc());
         }

@@ -14,15 +14,16 @@ import com.meetup.activities.GroupActivity;
 import com.meetup.adapter.MeetUpUserAdapter;
 import com.meetup.interfaces.Populatable;
 import com.meetup.networking.api.MeetUpGroupConnection;
+import com.meetup.objects.MeetUpGroup;
 import com.meetup.objects.MeetUpUser;
 
 import org.json.JSONArray;
 
+import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GroupMemberListFragment extends ListFragment implements Populatable {
-    private List<MeetUpUser> mGroupMembers = new ArrayList<MeetUpUser>();
     private MeetUpUserAdapter mGroupMembersAdapter;
 
     @Override
@@ -33,9 +34,6 @@ public class GroupMemberListFragment extends ListFragment implements Populatable
     @Override
     public void onResume() {
         super.onResume();
-
-        int groupId = ((GroupActivity) getActivity()).getGroupId();
-        new GetGroupMembersTask().execute(groupId);
     }
 
     @Override
@@ -46,7 +44,6 @@ public class GroupMemberListFragment extends ListFragment implements Populatable
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
     }
 
     private String getJwt() {
@@ -55,36 +52,41 @@ public class GroupMemberListFragment extends ListFragment implements Populatable
 
     @Override
     public void populate(Object... objs) {
-        // TODO
+        GroupActivity parentActivity = (GroupActivity) getActivity();
+
+        if (parentActivity != null) {
+            long groupId = parentActivity.getGroupId();
+
+//        new GetGroupInfoTask().execute(groupId);
+            new GetGroupMembersTask().execute(groupId);
+        }
     }
 
-    private class GetGroupMembersTask extends AsyncTask<Integer, Void, Void> {
-
+    private class GetGroupMembersTask extends AsyncTask<Long, Void, Void> {
         @Override
-        protected Void doInBackground(Integer... params) {
-            int groupId                     = params[0];
+        protected Void doInBackground(Long... params) {
+            long groupId                     = params[0];
+            GroupActivity parentActivity     = (GroupActivity) getActivity();
             MeetUpGroupConnection connection = new MeetUpGroupConnection(getJwt());
-            JSONArray groupMembersFromDb    = null;
+            JSONArray groupMembersFromDb     = null;
 
             try {
-                mGroupMembers.clear();
-                groupMembersFromDb = connection.getGroup(groupId);
+                parentActivity.clearGroupMembers();
+                groupMembersFromDb = connection.getGroupMembers(groupId);
 
                 for (int i = 0; i < groupMembersFromDb.length(); ++i) {
-                    mGroupMembers.add(new MeetUpUser(groupMembersFromDb.getJSONObject(i)));
+                    parentActivity.addGroupMember(new MeetUpUser(groupMembersFromDb.getJSONObject(i)));
                 }
 
-                if (mGroupMembersAdapter != null) {
-                    mGroupMembersAdapter = null;
-                }
-
-                mGroupMembersAdapter = new MeetUpUserAdapter(getActivity(), mGroupMembers);
+                List<MeetUpUser> members = new ArrayList<MeetUpUser>(parentActivity.getGroupMembers());
+                mGroupMembersAdapter = null;
+                mGroupMembersAdapter = new MeetUpUserAdapter(parentActivity, members);
             } catch (Exception e) {
                 e.printStackTrace();
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(getActivity(), "Failed to fetch group members.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), getString(R.string.failed_to_fetch_members), Toast.LENGTH_SHORT).show();
                     }
                 });
             }

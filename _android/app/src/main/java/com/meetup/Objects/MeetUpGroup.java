@@ -82,4 +82,8 @@ public class MeetUpGroup {
 
         return true;
     }
+
+    public void clearGroupMembers() {
+        this.groupMembers.clear();
+    }
 }

@@ -38,12 +38,12 @@ public class MeetUpGroupConnectionTest {
     private static final String GROUPID  = "groupid";
 
     @Test
-    public void meetUpGroupConnection_GetGroup_ReturnsGroup() throws Exception {
+    public void meetUpGroupConnection_GetGroupMembers_ReturnsGroup() throws Exception {
         // Setup.
         MeetUpGroupConnection connection = new MeetUpGroupConnection(HOST_NAME, mJwt);
 
         // Execute.
-        JSONArray groupMembers = connection.getGroup(mFirstGroup);
+        JSONArray groupMembers = connection.getGroupMembers(mFirstGroup);
         JSONObject memberOne   = groupMembers.getJSONObject(0);
         JSONObject memberTwo   = groupMembers.getJSONObject(1);
 
@@ -53,12 +53,12 @@ public class MeetUpGroupConnectionTest {
     }
 
     @Test
-    public void meetUpGroupConnection_GetGroup_ReturnsNull() throws Exception {
+    public void meetUpGroupConnection_GetGroupMembers_ReturnsNull() throws Exception {
         // Setup.
         MeetUpGroupConnection connection = new MeetUpGroupConnection(HOST_NAME, mJwt);
 
         // Execute.
-        JSONArray groupMembers = connection.getGroup(-1); // Should never exist.
+        JSONArray groupMembers = connection.getGroupMembers(-1); // Should never exist.
 
         // Assert.
         assertNull(groupMembers);

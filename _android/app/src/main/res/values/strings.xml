@@ -15,7 +15,9 @@
     </string>
     <string name="welcome_to_meetup">Welcome to MeetUp!</string>
     <string name="request_failed">Request Failed</string>
+    <string name="failed_to_fetch_group">Failed to get group info!</string>
     <string name="failed_to_fetch_groups">Failed to get your groups! :(</string>
+    <string name="failed_to_fetch_members">Failed to get group members!</string>
     <string name="failed_to_add_group">Failed to create group!</string>
     <string name="failed_to_delete_group">Failed to delete group!</string>
     <string name="failed_to_update_group_info">Failed to update group info!</string>

@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class MeetUpGroupConnection extends MeetUpMiddlewareConnection {
     /**
@@ -67,8 +68,8 @@ public class MeetUpGroupConnection extends MeetUpMiddlewareConnection {
         }
     }
 
-    public JSONArray getGroup(long groupId) throws IOException, RequestFailedException {
-        String url = formatURLString(getUrl(), GROUP, Long.toString(groupId));
+    public JSONArray getGroupMembers(long groupId) throws IOException, RequestFailedException {
+        String url = formatURLString(getUrl(), GROUP, MEMBERS, Long.toString(groupId));
 
         try {
             openConnection(url);
@@ -124,6 +125,28 @@ public class MeetUpGroupConnection extends MeetUpMiddlewareConnection {
 
 
             return Boolean.parseBoolean(getResponse());
+        } finally {
+            disconnect();
+        }
+    }
+
+    public JSONObject getGroupInfo(long groupId) throws RequestFailedException, IOException {
+        String url = formatURLString(getUrl(), GROUP, INFO, Long.toString(groupId));
+
+        try {
+            openConnection(url);
+            connect();
+
+            int responseCode = getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR)
+                throw new RequestFailedException(String.format("Failed to fetch group info for group[%d].", groupId));
+            else if (responseCode == HttpURLConnection.HTTP_NO_CONTENT)
+                throw new NoSuchElementException(String.format("No content for group[%d].", groupId));
+
+            return new JSONObject(getResponse());
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
         } finally {
             disconnect();
         }

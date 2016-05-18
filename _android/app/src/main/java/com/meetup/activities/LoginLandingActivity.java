@@ -425,12 +425,8 @@ public class LoginLandingActivity extends MeetUpActivity implements LoaderCallba
                 });
             } else if (statusCode == HttpURLConnection.HTTP_OK) {
                 Toast.makeText(getApplicationContext(), getString(R.string.welcome_to_meetup), Toast.LENGTH_LONG).show();
-                // TODO: Take user to UserLandingActivity.
                 Intent userLandingActivity = new Intent(LoginLandingActivity.this, UserLandingActivity.class);
                 startActivity(userLandingActivity);
-//                Intent groupActivityIntent = new Intent(LoginLandingActivity.this, GroupActivity.class);
-//                groupActivityIntent.putExtra(MeetUpApplication.GROUPID_KEY, 1);
-//                startActivity(groupActivityIntent);
             } else {
                 Toast.makeText(getApplicationContext(), String.format(getString(R.string.login_failed), getEmail()), Toast.LENGTH_LONG).show();
             }
@@ -503,9 +499,6 @@ public class LoginLandingActivity extends MeetUpActivity implements LoaderCallba
                 // TODO: Take user to UserLandingActivity.
                 Intent userLandingActivity = new Intent(LoginLandingActivity.this, UserLandingActivity.class);
                 startActivity(userLandingActivity);
-//                Intent groupActivityIntent = new Intent(LoginLandingActivity.this, GroupActivity.class);
-//                groupActivityIntent.putExtra(MeetUpApplication.GROUPID_KEY, 1);
-//                startActivity(groupActivityIntent);
             }
             else {
                 Toast.makeText(getApplicationContext(), String.format(getString(R.string.registration_failed), getEmail()), Toast.LENGTH_LONG).show();
