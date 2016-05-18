@@ -140,10 +140,12 @@ public class UserLandingActivity extends MeetUpActivity  {
     }
 
     private void delete() {
-        if (mListView.getCheckedItemPosition() > -1) {
-            mGroupList.remove(mListView.getCheckedItemPosition());
-            mGroupAdapter.notifyDataSetChanged();
-            Toast.makeText(getApplicationContext(), "Group Deleted", Toast.LENGTH_LONG).show();
+        int groupIndex = mListView.getCheckedItemPosition();
+
+        if (groupIndex > -1) {
+            MeetUpGroup groupToDelete = mGroupList.get(groupIndex);
+
+            new DeleteGroupTask().execute(groupToDelete.getId());
         } else {
             Toast.makeText(getApplicationContext(), "Nothing to Delete", Toast.LENGTH_LONG).show();
         }
@@ -260,6 +262,38 @@ public class UserLandingActivity extends MeetUpActivity  {
                     @Override
                     public void run() {
                         Toast.makeText(getApplicationContext(), getString(R.string.failed_to_add_group), Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+
+            return null;
+        }
+    }
+
+    private class DeleteGroupTask extends AsyncTask<String, Void, Void> {
+        @Override
+        protected Void doInBackground(String... params) {
+            String groupId = params[0];
+
+            MeetUpGroupConnection deleteGroupConnection = new MeetUpGroupConnection(MeetUpUserConnection.MU_API_URL, getJwt());
+
+            try {
+                deleteGroupConnection.deleteGroup(Long.parseLong(groupId));
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mGroupList.remove(mListView.getCheckedItemPosition());
+                        mGroupAdapter.notifyDataSetChanged();
+                        Toast.makeText(getApplicationContext(), "Group Deleted", Toast.LENGTH_LONG).show();
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), getString(R.string.failed_to_delete_group), Toast.LENGTH_LONG).show();
                     }
                 });
             }
