@@ -64,7 +64,7 @@ exports.getGroup = function (data, send) {
       send(errorHandler);
     } else {
       var preparedStatement = "SELECT * " +
-                              "FROM get_group_info($1::int);";
+                              "FROM get_group_info($1::bigint);";
       var inserts = [ groupId ];
 
       client.query(preparedStatement, inserts, function (err, result) {
@@ -106,7 +106,8 @@ exports.getNextGroupId = function (data, send) {
           ErrorHelper.mergeMessages(errorHandler, 500, err);
           send(errorHandler, false);
         } else {
-          var nextGroupId = result.rows[0].groupid + 1;
+          var groupIdVal  = parseInt(result.rows[0].groupid);
+          var nextGroupId = groupIdVal + 1;
           var data        = { groupid: nextGroupId };
 
           send(errorHandler, data);
@@ -126,7 +127,7 @@ exports.deleteGroup = function (data, send) {
       send(errorHandler, false);
     } else {
       var preparedStatement = "DELETE FROM groups_info " +
-                              "WHERE groupid=$1::int;";
+                              "WHERE groupid=$1::bigint;";
       var inserts           = [ groupId ];
 
       client.query(preparedStatement, inserts, function (err, result) {
@@ -150,7 +151,7 @@ exports.updateGroupInfo = function (data, send) {
       send(errorHandler, false);
     } else {
       var preparedStatement = "SELECT * " +
-                              "FROM groups_info_upsert($1::int, $2::text, $3::text);";
+                              "FROM groups_info_upsert($1::bigint, $2::text, $3::text);";
       var inserts           = [ data.groupId, data.groupName, data.groupDesc ];
 
       client.query(preparedStatement, inserts, function (err, result) {
@@ -181,7 +182,7 @@ exports.updateGroupMembers = function (data, send) {
       send(errorHandler);
     } else {
       var preparedStatement = "SELECT * " +
-                              "FROM user_groups_upsert($1::int, $2::int[]);";
+                              "FROM user_groups_upsert($1::bigint, $2::int[]);";
       var inserts           = [ groupId, groupMembers ];
 
       client.query(preparedStatement, inserts, function (err, result) {

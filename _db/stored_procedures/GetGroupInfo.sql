@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION get_group_info(
-	group_id INT
+	group_id BIGINT
 ) RETURNS TABLE(userId    INT,
 				nameFirst CHARACTER VARYING,
 				nameLast  CHARACTER VARYING

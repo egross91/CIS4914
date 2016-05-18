@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION groups_info_upsert(
-	group_id   INT,
+	group_id   BIGINT,
 	group_name TEXT,
 	group_desc TEXT
 ) RETURNS VOID LANGUAGE plpgsql AS $$

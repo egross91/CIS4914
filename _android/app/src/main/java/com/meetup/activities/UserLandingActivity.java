@@ -239,13 +239,13 @@ public class UserLandingActivity extends MeetUpActivity  {
             MeetUpUserConnection userInfoConnection  = new MeetUpUserConnection(MeetUpConnection.MU_API_URL, getJwt());
 
             try {
-                int groupId = groupIdConnection.getNextGroupId();
+                long groupId = groupIdConnection.getNextGroupId();
                 MeetUpUser me = new MeetUpUser(userInfoConnection.getCurrentUser());
-                final MeetUpGroup newGroup = new MeetUpGroup(groupName, Integer.toString(groupId), "");
+                final MeetUpGroup newGroup = new MeetUpGroup(groupName, Long.toString(groupId), "");
 
                 newGroup.addGroupMember(me);
                 addGroupConnection.updateGroupInfo(newGroup);
-                grpMembsConnection.updateGroupMembers(Integer.parseInt(newGroup.getId()), convertMembersToListOfInts(newGroup.getGroupMembers()));
+                grpMembsConnection.updateGroupMembers(Long.parseLong(newGroup.getId()), convertMembersToListOfInts(newGroup.getGroupMembers()));
 
                 runOnUiThread(new Runnable() {
                     @Override
@@ -322,8 +322,3 @@ public class UserLandingActivity extends MeetUpActivity  {
         }
     }
 }
-
-
-
-
-

@@ -67,8 +67,8 @@ public class MeetUpGroupConnection extends MeetUpMiddlewareConnection {
         }
     }
 
-    public JSONArray getGroup(int groupId) throws IOException, RequestFailedException {
-        String url = formatURLString(getUrl(), GROUP, Integer.toString(groupId));
+    public JSONArray getGroup(long groupId) throws IOException, RequestFailedException {
+        String url = formatURLString(getUrl(), GROUP, Long.toString(groupId));
 
         try {
             openConnection(url);
@@ -88,7 +88,7 @@ public class MeetUpGroupConnection extends MeetUpMiddlewareConnection {
         }
     }
 
-    public int getNextGroupId() throws IOException, RequestFailedException {
+    public long getNextGroupId() throws IOException, RequestFailedException {
         String url = formatURLString(getUrl(), GROUP, GROUPS, ID);
 
         try {
@@ -101,7 +101,7 @@ public class MeetUpGroupConnection extends MeetUpMiddlewareConnection {
 
             JSONObject responseObject = new JSONObject(getResponse());
 
-            return responseObject.getInt(GROUPID);
+            return responseObject.getLong(GROUPID);
         } catch (JSONException e) {
             return -1;
         } finally {
@@ -109,8 +109,8 @@ public class MeetUpGroupConnection extends MeetUpMiddlewareConnection {
         }
     }
 
-    public boolean deleteGroup(int groupId) throws IOException, RequestFailedException {
-        String url = formatURLString(getUrl(), GROUP, DEL, Integer.toString(groupId));
+    public boolean deleteGroup(long groupId) throws IOException, RequestFailedException {
+        String url = formatURLString(getUrl(), GROUP, DEL, Long.toString(groupId));
 
         try {
             openConnection(url, POST);
@@ -129,8 +129,8 @@ public class MeetUpGroupConnection extends MeetUpMiddlewareConnection {
         }
     }
 
-    public boolean updateGroupMembers(int groupId, List<Integer> idsOfGroupMembers) throws RequestFailedException {
-        String url = formatURLString(getUrl(), GROUP, MEMBERS, UPDATE, Integer.toString(groupId));
+    public boolean updateGroupMembers(long groupId, List<Integer> idsOfGroupMembers) throws RequestFailedException {
+        String url = formatURLString(getUrl(), GROUP, MEMBERS, UPDATE, Long.toString(groupId));
 
         try {
             openConnection(url, POST);
@@ -154,8 +154,8 @@ public class MeetUpGroupConnection extends MeetUpMiddlewareConnection {
         return updateGroupInfo(Integer.parseInt(group.getId()), group.getName(), group.getDescription());
     }
 
-    public boolean updateGroupInfo(int groupId, String groupName, String groupDesc) throws RequestFailedException {
-        String url = formatURLString(getUrl(), GROUP, INFO, UPDATE, Integer.toString(groupId));
+    public boolean updateGroupInfo(long groupId, String groupName, String groupDesc) throws RequestFailedException {
+        String url = formatURLString(getUrl(), GROUP, INFO, UPDATE, Long.toString(groupId));
 
         try {
             openConnection(url, POST);

@@ -51,10 +51,12 @@ describe("Testing the Authorization Data Accessor - makes DB calls.", function (
       expect(data).toBeTruthy();
     });
 
-    AuthDA.register(requestMockObj, function (err, data) {
-      expect(err.statusCode).toBe(409); // User exists.
-      done();
-    })
+    setTimeout(function () {
+      AuthDA.register(requestMockObj, function (err, data) {
+        expect(err.statusCode).toBe(409); // User exists.
+        done();
+      })
+    }, 300);
   });
 
   it("should NOT allow a user to login without registering", function (done) {

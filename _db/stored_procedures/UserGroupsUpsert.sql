@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION user_groups_upsert(
-	group_id      INT,
+	group_id      BIGINT,
 	group_members INT ARRAY
 ) RETURNS VOID LANGUAGE plpgsql AS $$
 BEGIN

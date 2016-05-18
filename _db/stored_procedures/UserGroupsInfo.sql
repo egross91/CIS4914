@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION user_groups_info(
 	user_id INT
-) RETURNS TABLE(groupId          INT,
+) RETURNS TABLE(groupId          BIGINT,
 				groupName        TEXT,
 				groupDescription TEXT
 				) LANGUAGE plpgsql AS $$

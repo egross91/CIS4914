@@ -24,9 +24,9 @@ public class MeetUpGroupConnectionTest {
      */
     private final int mFirstUser   = 18;
     private final int mSecondUser  = 19;
-    private final int mFirstGroup  = 1;
-    private final int mSecondGroup = 2;
-    private final int mThirdGroup  = 3;
+    private final long mFirstGroup  = 1;
+    private final long mSecondGroup = 2;
+    private final long mThirdGroup  = 3;
 
     private final String mGroupName = "other";
     private final String mGroupDesc = "group";
@@ -107,7 +107,7 @@ public class MeetUpGroupConnectionTest {
         MeetUpGroupConnection connection = new MeetUpGroupConnection(HOST_NAME, mJwt);
 
         // Execute.
-        int nextGroupId = connection.getNextGroupId();
+        long nextGroupId = connection.getNextGroupId();
 
         // Assert.
         assertEquals(nextGroupId, mThirdGroup);

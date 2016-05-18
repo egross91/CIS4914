@@ -54,48 +54,6 @@ describe("Unit tests for the User Controller", function () {
 
   // TODO: Create beforeAll() & afterAll() to create and clean mock data in DB.
 
-  it("should return the group information when sending the 'groupid' - getGroup().", function (done) {
-    setTimeout(function () {
-      UserController.getGroup(requestMockObj, responseMockObj);
-
-      setTimeout(function () {
-        expect(result).toContain(jasmine.objectContaining({
-          userid: mockGroupMemberOne
-        }));
-        expect(result).toContain(jasmine.objectContaining({
-          userid: mockGroupMemberTwo
-        }));
-        done();
-      }, 400)
-    }, 100);
-  });
-
-  it("should return 204 error if no one is found - getGroup().", function (done) {
-    requestMockObj.params.groupId = -1; // Should never exist.
-
-    setTimeout(function () {
-      UserController.getGroup(requestMockObj, responseMockObj);
-
-      setTimeout(function () {
-        expect(result.statusCode).toBe(204); // No Content.
-        done();
-      }, 400);
-    }, 100);
-  });
-
-  it("should return a 500 error if an integer is not supplied for 'groupid' - getGroup().", function (done) {
-    requestMockObj.params.groupId = "fail";
-
-    setTimeout(function () {
-      UserController.getGroup(requestMockObj, responseMockObj);
-
-      setTimeout(function () {
-        expect(result.statusCode).toBe(500); // Internal Server Error.
-        done();
-      }, 400);
-    }, 100);
-  });
-
   it("should return any friends for a user - getFriends().", function (done) {
     setTimeout(function () {
       UserController.getFriends(requestMockObj, responseMockObj);
@@ -142,34 +100,6 @@ describe("Unit tests for the User Controller", function () {
 
     setTimeout(function () {
       UserController.updateUser(requestMockObj, responseMockObj);
-
-      setTimeout(function () {
-        expect(result).toBe(true);
-        done();
-      }, 100);
-    }, 100);
-  });
-
-  it("should update the group info successfully", function (done) {
-    requestMockObj.headers.groupname = "other";
-    requestMockObj.headers.groupdesc = "group";
-    requestMockObj.params.groupId    = 2;
-
-    setTimeout(function () {
-      UserController.updateGroupInfo(requestMockObj, responseMockObj);
-
-      setTimeout(function () {
-        expect(result).toBe(true);
-        done();
-      }, 100);
-    }, 100);
-  });
-
-  it("should return true if a group was deleted successfully - deleteGroup()", function (done) {
-    requestMockObj.params.groupId = 3;
-
-    setTimeout(function () {
-      UserController.deleteGroup(requestMockObj, responseMockObj);
 
       setTimeout(function () {
         expect(result).toBe(true);
